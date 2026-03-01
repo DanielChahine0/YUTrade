@@ -31,7 +31,6 @@ from app.routers.auth import router as auth_router
 from app.routers.listings import router as listing_router
 
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Create database tables on startup."""
