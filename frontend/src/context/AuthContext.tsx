@@ -52,26 +52,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [loading, setLoading] = useState(true)
     useEffect(() => {
     const storedToken = localStorage.getItem("access_token")
-    if (storedToken) {
-      // TODO: replace with real token decode or /auth/me API call
-      setUser({
-        id: 0,
-        email: "",
-        name: "",
-        is_verified: false,
-        created_at: "",
-      })
-      setToken(storedToken)
+    const storedUser = localStorage.getItem("user")
+    if (storedToken && storedUser) {
+      try {
+        setUser(JSON.parse(storedUser))
+        setToken(storedToken)
+      } catch {
+        localStorage.removeItem("access_token")
+        localStorage.removeItem("user")
+      }
     }
     setLoading(false)
   }, [])
     const login = (token: string, user: User) => {
         localStorage.setItem("access_token", token)
+        localStorage.setItem("user", JSON.stringify(user))
         setUser(user)
         setToken(token)
     }
     const logout = () => {
         localStorage.removeItem("access_token")
+        localStorage.removeItem("user")
         setUser(null)
         setToken(null)
     }
