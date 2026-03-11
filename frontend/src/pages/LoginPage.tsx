@@ -45,7 +45,7 @@ export default function LoginPage() {
       navigate("/");
     } catch (err: any) {
       if (err?.response?.status === 401) setError("Invalid email or password");
-      else if (err?.response?.status === 403) setError("403");
+      else if (err?.response?.status === 403) setError("Please verify your email first.");
       else setError("Something went wrong");
     } finally {
       setLoading(false);
@@ -59,7 +59,7 @@ export default function LoginPage() {
     <form className="auth-form" onSubmit={handleSubmit}>
       <div className="auth-field">
         <label className="auth-label">Username</label>
-        <input className="auth-input" type="email"  onChange={(e) => setEmail(e.target.value)}
+        <input className="auth-input" type="email" value={email} onChange={(e) => setEmail(e.target.value)}
   required />
       </div>
       <div className="auth-field">
