@@ -74,14 +74,14 @@ def create_listing(
             ext = image.filename.rsplit(".", 1)[1]
 
         filename = f"{uuid4()}.{ext}" if ext else str(uuid4())
-        file_path = os.path.join("uploads", filename)
+        disk_path = os.path.join("uploads", filename)
 
-        with open(file_path, "wb") as file_object:
+        with open(disk_path, "wb") as file_object:
             file_object.write(image.file.read())
 
         image_record = Image(
             listing_id=listing.id,
-            file_path=file_path,
+            file_path=f"uploads/{filename}",
             position=index,
         )
         db.add(image_record)
