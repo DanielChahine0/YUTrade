@@ -54,11 +54,11 @@ export default function ListingDetailPage() {
   const header = (
     <div className="app-header">
       <button className="app-header-btn" onClick={() => navigate(-1)}>
-        ←
+        ← Back
       </button>
       <span className="app-header-title">Listing Details</span>
       <button className="app-header-btn" onClick={() => navigate("/my-listings")}>
-        👤
+        My Listings
       </button>
     </div>
   )
