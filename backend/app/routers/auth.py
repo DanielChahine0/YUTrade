@@ -34,9 +34,15 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.dependencies import get_db
-from app.schemas.auth import RegisterRequest, VerifyRequest, LoginRequest, TokenResponse
+from app.schemas.auth import (
+    RegisterRequest, VerifyRequest, LoginRequest, TokenResponse,
+    ForgotPasswordRequest, ResetPasswordRequest,
+)
 from app.schemas.user import UserOut
-from app.services.auth_service import register_user, verify_user, authenticate_user, resend_verification_code
+from app.services.auth_service import (
+    register_user, verify_user, authenticate_user, resend_verification_code,
+    request_password_reset, reset_password,
+)
 from app.utils.security import create_access_token
 
 router = APIRouter()
@@ -73,3 +79,17 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
         token_type="bearer",
         user=UserOut.model_validate(user),
     )
+
+
+@router.post("/forgot-password", status_code=status.HTTP_200_OK)
+def forgot_password(request: ForgotPasswordRequest, db: Session = Depends(get_db)):
+    """Send a password reset code to the user's email."""
+    request_password_reset(db, request.email)
+    return {"message": "Password reset code sent to your email"}
+
+
+@router.post("/reset-password", status_code=status.HTTP_200_OK)
+def reset_password_endpoint(request: ResetPasswordRequest, db: Session = Depends(get_db)):
+    """Reset a user's password using a valid reset code."""
+    reset_password(db, request.email, request.code, request.new_password)
+    return {"message": "Password reset successfully"}

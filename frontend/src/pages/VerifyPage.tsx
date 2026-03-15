@@ -21,7 +21,7 @@ import { useState, useEffect, useRef } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { verify, resendVerification } from "../api/auth"
 
-const CODE_LENGTH = 5
+const CODE_LENGTH = 6
 const RESEND_SECONDS = 60
 
 export default function VerifyPage() {
@@ -99,7 +99,7 @@ export default function VerifyPage() {
         <span className="yu-logo">YUTrade</span>
         <h1 className="auth-title">Verify Email</h1>
         <p style={{ fontSize: 12, color: '#666', textAlign: 'center', marginBottom: 8 }}>
-          We've sent a 5-digit verification code to your YorkU email.
+          We've sent a 6-digit verification code to your YorkU email.
         </p>
 
         <form className="auth-form" onSubmit={handleSubmit}>

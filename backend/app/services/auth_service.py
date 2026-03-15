@@ -37,8 +37,9 @@ from fastapi import HTTPException, status
 from app.config import settings
 from app.models.user import User
 from app.models.verification import VerificationCode
+from app.models.password_reset import PasswordResetCode
 from app.utils.security import hash_password, verify_password
-from app.services.email_service import send_verification_email
+from app.services.email_service import send_verification_email, send_password_reset_email
 
 ALLOWED_DOMAINS = ("@my.yorku.ca", "@yorku.ca")
 
@@ -161,14 +162,14 @@ def authenticate_user(db: Session, email: str, password: str) -> User:
     user = db.query(User).filter(User.email == email.lower()).first()
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password",
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No account found with this email",
         )
 
     if not verify_password(password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password",
+            detail="Invalid password",
         )
 
     if not user.is_verified:
@@ -178,3 +179,64 @@ def authenticate_user(db: Session, email: str, password: str) -> User:
         )
 
     return user
+
+
+def request_password_reset(db: Session, email: str) -> None:
+    """Generate a password reset code and email it to the user."""
+    user = db.query(User).filter(User.email == email.lower()).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No account found with this email",
+        )
+
+    # Delete any existing reset codes for this user
+    db.query(PasswordResetCode).filter(PasswordResetCode.user_id == user.id).delete()
+
+    code = str(random.randint(100000, 999999))
+    reset = PasswordResetCode(
+        user_id=user.id,
+        code=code,
+        expires_at=datetime.utcnow() + timedelta(minutes=settings.VERIFICATION_CODE_EXPIRE_MINUTES),
+    )
+    db.add(reset)
+    db.commit()
+
+    send_password_reset_email(email.lower(), code)
+
+
+def reset_password(db: Session, email: str, code: str, new_password: str) -> None:
+    """Verify reset code and update the user's password."""
+    user = db.query(User).filter(User.email == email.lower()).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User not found",
+        )
+
+    reset = (
+        db.query(PasswordResetCode)
+        .filter(
+            PasswordResetCode.user_id == user.id,
+            PasswordResetCode.used == False,
+            PasswordResetCode.expires_at > datetime.utcnow(),
+        )
+        .order_by(PasswordResetCode.id.desc())
+        .first()
+    )
+
+    if not reset or reset.code != code:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired reset code",
+        )
+
+    if len(new_password.encode("utf-8")) > 72:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password cannot be longer than 72 bytes.",
+        )
+
+    reset.used = True
+    user.password_hash = hash_password(new_password)
+    db.commit()
