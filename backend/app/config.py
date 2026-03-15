@@ -17,9 +17,12 @@
 # 3. Export a single `settings` instance for use across the app
 
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
+# Load .env from the backend root directory (parent of app/)
+_env_path = Path(__file__).resolve().parent.parent / ".env"
+load_dotenv(_env_path)
 
 class Settings:
     def __init__(self) -> None:
