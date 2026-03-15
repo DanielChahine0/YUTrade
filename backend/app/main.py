@@ -26,7 +26,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.database import Base, engine
-from app.models import User, VerificationCode, Listing, Image, Message  # noqa: F401 — register models
+from app.models import User, VerificationCode, PasswordResetCode, Listing, Image, Message  # noqa: F401 — register models
 from app.routers.auth import router as auth_router
 from app.routers.listings import router as listing_router
 

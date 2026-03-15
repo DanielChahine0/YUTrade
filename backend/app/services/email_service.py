@@ -22,6 +22,41 @@ from email.message import EmailMessage
 from app.config import settings
 
 
+def send_password_reset_email(email: str, code: str) -> None:
+    """Send a password reset code via console log or SMTP."""
+    if settings.EMAIL_BACKEND == "console":
+        print(f"[DEV] Password reset code for {email}: {code}")
+    elif settings.EMAIL_BACKEND == "smtp":
+        import asyncio
+        import aiosmtplib
+
+        msg = EmailMessage()
+        msg["Subject"] = "YU Trade - Password Reset"
+        msg["From"] = settings.SMTP_USER
+        msg["To"] = email
+        msg.set_content(
+            f"Your YU Trade password reset code is: {code}\n\nThis code expires in 15 minutes.\n\nIf you did not request a password reset, you can ignore this email."
+        )
+
+        try:
+            asyncio.run(
+                aiosmtplib.send(
+                    msg,
+                    hostname=settings.SMTP_HOST,
+                    port=settings.SMTP_PORT,
+                    username=settings.SMTP_USER,
+                    password=settings.SMTP_PASSWORD,
+                    start_tls=True,
+                )
+            )
+            print(f"[SMTP] Password reset email sent to {email}")
+        except Exception as e:
+            print(f"[SMTP ERROR] Failed to send reset email to {email}: {e}")
+            print(f"[FALLBACK] Password reset code for {email}: {code}")
+    else:
+        print(f"[DEV] Password reset code for {email}: {code}")
+
+
 def send_verification_email(email: str, code: str) -> None:
     """Send a verification code via console log or SMTP."""
     if settings.EMAIL_BACKEND == "console":

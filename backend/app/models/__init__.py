@@ -5,6 +5,7 @@
 
 from .user import User
 from .verification import VerificationCode
+from .password_reset import PasswordResetCode
 from .listing import Listing
 from .image import Image
 from .message import Message

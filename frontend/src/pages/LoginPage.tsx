@@ -44,7 +44,8 @@ export default function LoginPage() {
       login(access_token, user);
       navigate("/");
     } catch (err: any) {
-      if (err?.response?.status === 401) setError("Invalid email or password");
+      if (err?.response?.status === 404) setError("__no_account__");
+      else if (err?.response?.status === 401) setError("Invalid password. Please try again.");
       else if (err?.response?.status === 403) setError("Please verify your email first.");
       else setError("Something went wrong");
     } finally {
@@ -72,11 +73,33 @@ export default function LoginPage() {
   required
 />
       </div>
-      {error && <p className="auth-error">{error}</p>}
-      <button className="btn-red" type="button" onClick={() => navigate("/register")}>
+      {error === "__no_account__" ? (
+        <div className="auth-error" style={{ textAlign: "center" }}>
+          No account found with this email.{" "}
+          <span
+            style={{ textDecoration: "underline", cursor: "pointer" }}
+            onClick={() => navigate("/register")}
+          >
+            Create an account?
+          </span>
+        </div>
+      ) : error ? (
+        <p className="auth-error">{error}</p>
+      ) : null}
+      <button
+        className="btn-outline"
+        type="button"
+        style={{ textAlign: "right", background: "none", border: "none", padding: 0, color: "#888", fontSize: 12, cursor: "pointer", alignSelf: "flex-end" }}
+        onClick={() => navigate(`/forgot-password?email=${encodeURIComponent(email)}`)}
+      >
+        Forgot password?
+      </button>
+      <button className="btn-red" type="submit" disabled={loading}>
+        {loading ? "Logging in…" : "Login"}
+      </button>
+      <button className="btn-outline" type="button" onClick={() => navigate("/register")}>
         Create a New Account
       </button>
-      <button className="btn-outline" type="submit">Login</button>
     </form>
   </div>
 </div>

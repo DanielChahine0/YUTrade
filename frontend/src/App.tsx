@@ -12,6 +12,9 @@ import ListingDetailPage from "./pages/ListingDetailPage"
 import MyListingsPage from "./pages/MyListingsPage"
 import SellerProfilePage from "./pages/SellerProfilePage"
 import BrowsePage from "./pages/BrowsePage"
+import ForgotPasswordPage from "./pages/ForgotPasswordPage"
+import ResetPasswordPage from "./pages/ResetPasswordPage"
+import ProtectedRoute from "./components/ProtectedRoute"
 
 function App() {
   return (
@@ -22,9 +25,11 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/verify" element={<VerifyPage />} />
-          <Route path="/create" element={<CreateListingPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/create" element={<ProtectedRoute><CreateListingPage /></ProtectedRoute>} />
           <Route path="/listings/:id" element={<ListingDetailPage />} />
-          <Route path="/my-listings" element={<MyListingsPage />} />
+          <Route path="/my-listings" element={<ProtectedRoute><MyListingsPage /></ProtectedRoute>} />
           <Route path="/seller/:id" element={<SellerProfilePage />} />
         </Routes>
       </BrowserRouter>
