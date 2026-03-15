@@ -44,8 +44,22 @@ from app.services.email_service import send_verification_email, send_password_re
 ALLOWED_DOMAINS = ("@my.yorku.ca", "@yorku.ca")
 
 
+def purge_expired_codes(db: Session) -> None:
+    """Delete all expired or used verification and password-reset codes."""
+    now = datetime.utcnow()
+    db.query(VerificationCode).filter(
+        (VerificationCode.expires_at <= now) | (VerificationCode.used == True)
+    ).delete(synchronize_session=False)
+    db.query(PasswordResetCode).filter(
+        (PasswordResetCode.expires_at <= now) | (PasswordResetCode.used == True)
+    ).delete(synchronize_session=False)
+    db.commit()
+
+
 def register_user(db: Session, email: str, password: str, name: str) -> User:
     """Register a new user, generate verification code, and send it."""
+    purge_expired_codes(db)
+
     # Validate email domain
     email_lower = email.lower()
     if not any(email_lower.endswith(domain) for domain in ALLOWED_DOMAINS):
@@ -101,6 +115,8 @@ def register_user(db: Session, email: str, password: str, name: str) -> User:
 
 def resend_verification_code(db: Session, email: str) -> None:
     """Delete old codes and issue a fresh verification code for an unverified user."""
+    purge_expired_codes(db)
+
     user = db.query(User).filter(User.email == email.lower()).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
@@ -124,6 +140,8 @@ def resend_verification_code(db: Session, email: str) -> None:
 
 def verify_user(db: Session, email: str, code: str) -> bool:
     """Verify a user's email with the provided code."""
+    purge_expired_codes(db)
+
     user = db.query(User).filter(User.email == email.lower()).first()
     if not user:
         raise HTTPException(
@@ -183,6 +201,8 @@ def authenticate_user(db: Session, email: str, password: str) -> User:
 
 def request_password_reset(db: Session, email: str) -> None:
     """Generate a password reset code and email it to the user."""
+    purge_expired_codes(db)
+
     user = db.query(User).filter(User.email == email.lower()).first()
     if not user:
         raise HTTPException(
@@ -207,6 +227,8 @@ def request_password_reset(db: Session, email: str) -> None:
 
 def reset_password(db: Session, email: str, code: str, new_password: str) -> None:
     """Verify reset code and update the user's password."""
+    purge_expired_codes(db)
+
     user = db.query(User).filter(User.email == email.lower()).first()
     if not user:
         raise HTTPException(
