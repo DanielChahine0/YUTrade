@@ -72,7 +72,7 @@ export default function CreateListingPage() {
 
   return (
     <div className="auth-page">
-      <div className="auth-card listing-card">
+      <div className="auth-card" style={{ width: 500 }}>
         <h1 className="auth-title">Create Listing</h1>
 
         <form className="auth-form" onSubmit={handleSubmit}>
