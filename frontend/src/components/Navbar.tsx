@@ -32,4 +32,50 @@
 //   - Text/links: white (on red bg) or dark (on white bg)
 //   - Horizontal layout, logo left, links right
 //   - Responsive: hamburger menu on mobile (optional stretch goal)
-export {}
+import React from "react"
+import { Link } from "react-router-dom"
+import { useAuth } from "../hooks/useAuth"
+
+export const Navbar: React.FC = () => {
+    const { isAuthenticated, user, logout } = useAuth()
+
+    return (
+        <nav className="navbar" style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: "0.5rem 1rem",
+            backgroundColor: "#E31837",
+            color: "white"
+        }}>
+            <Link to="/" className="navbar-brand" style={{ color: "white", fontWeight: "bold" }}>
+                YU Trade
+            </Link>
+
+            <div className="navbar-links" style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+                <Link to="/" style={{ color: "white" }}>Browse</Link>
+
+                {isAuthenticated ? (
+                    <>
+                        <Link to="/create" style={{ color: "white" }}>Sell Item</Link>
+                        <Link to="/my-listings" style={{ color: "white" }}>My Listings</Link>
+                        <Link to="/messages" style={{ color: "white" }}>Messages</Link>
+                        <span>Hello, {user?.name}</span>
+                        <button onClick={logout} style={{
+                            background: "white",
+                            color: "#E31837",
+                            border: "none",
+                            padding: "0.25rem 0.5rem",
+                            cursor: "pointer"
+                        }}>Logout</button>
+                    </>
+                ) : (
+                    <>
+                        <Link to="/login" style={{ color: "white" }}>Login</Link>
+                        <Link to="/register" style={{ color: "white" }}>Register</Link>
+                    </>
+                )}
+            </div>
+        </nav>
+    )
+}
