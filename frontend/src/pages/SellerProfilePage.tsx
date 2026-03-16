@@ -53,11 +53,11 @@ export default function SellerProfilePage() {
     <div className="app-screen">
       <div className="app-header">
         <button className="app-header-btn" onClick={() => navigate(-1)}>
-          ←
+          ← Back
         </button>
-        <span className="app-header-title">Seller Profile Page</span>
-        <button className="app-header-btn" onClick={() => navigate("/my-listings")}>
-          👤
+        <span className="app-header-title">Seller Profile</span>
+        <button className="app-header-btn" onClick={() => navigate("/")}>
+          Browse
         </button>
       </div>
 

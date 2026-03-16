@@ -64,12 +64,18 @@ export default function BrowsePage() {
         <div style={{ display: "flex", gap: 8 }}>
           {isAuthenticated ? (
             <>
-              <button className="app-header-btn" onClick={() => navigate("/create")} title="Create Listing">+</button>
-              <button className="app-header-btn" onClick={() => navigate("/my-listings")} title="My Listings">👤</button>
-              <button className="app-header-btn" onClick={() => { logout(); navigate("/login") }} title="Logout">⎋</button>
+              <button className="app-header-btn" onClick={() => navigate("/create")}>
+                + New Listing
+              </button>
+              <button className="app-header-btn" onClick={() => navigate("/my-listings")}>
+                My Listings
+              </button>
+              <button className="app-header-btn" onClick={() => { logout(); navigate("/login") }}>
+                Logout
+              </button>
             </>
           ) : (
-            <button className="btn-red" style={{ padding: "4px 12px", fontSize: 13 }} onClick={() => navigate("/login")}>
+            <button className="app-header-btn" onClick={() => navigate("/login")}>
               Login
             </button>
           )}
@@ -77,44 +83,48 @@ export default function BrowsePage() {
       </div>
 
       <div className="app-content">
-        {/* Search bar */}
-        <form onSubmit={handleSearch} style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-          <input
-            className="auth-input"
-            style={{ flex: 1, marginBottom: 0 }}
-            type="text"
-            placeholder="Search listings…"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-          />
-          <button className="btn-red" type="submit" style={{ width: "auto", padding: "0 16px" }}>
-            Search
-          </button>
-        </form>
+        {/* Search + filter row */}
+        <div style={{ display: "flex", gap: 12, marginBottom: 18, alignItems: "center", flexWrap: "wrap" }}>
+          <form onSubmit={handleSearch} style={{ display: "flex", gap: 8, flex: "1 1 280px", minWidth: 0 }}>
+            <input
+              className="auth-input"
+              style={{ flex: 1, marginBottom: 0 }}
+              type="text"
+              placeholder="Search listings…"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
+            <button className="btn-red" type="submit" style={{ width: "auto", padding: "0 20px", flexShrink: 0 }}>
+              Search
+            </button>
+          </form>
 
-        {/* Category filters */}
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
-          {CATEGORIES.map((cat) => {
-            const active = (cat === "All" && !category) || cat === category
-            return (
-              <button
-                key={cat}
-                onClick={() => handleCategoryChange(cat)}
-                style={{
-                  padding: "4px 12px",
-                  borderRadius: 16,
-                  border: "1px solid",
-                  borderColor: active ? "#E31837" : "#ccc",
-                  background: active ? "#E31837" : "#fff",
-                  color: active ? "#fff" : "#333",
-                  cursor: "pointer",
-                  fontSize: 13,
-                }}
-              >
-                {cat}
-              </button>
-            )
-          })}
+          {/* Category filters */}
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+            {CATEGORIES.map((cat) => {
+              const active = (cat === "All" && !category) || cat === category
+              return (
+                <button
+                  key={cat}
+                  onClick={() => handleCategoryChange(cat)}
+                  style={{
+                    padding: "6px 14px",
+                    borderRadius: 20,
+                    border: "1.5px solid",
+                    borderColor: active ? "#E31837" : "#ddd",
+                    background: active ? "#E31837" : "#fff",
+                    color: active ? "#fff" : "#555",
+                    cursor: "pointer",
+                    fontSize: 13,
+                    fontWeight: active ? 600 : 400,
+                    transition: "all 0.15s",
+                  }}
+                >
+                  {cat}
+                </button>
+              )
+            })}
+          </div>
         </div>
 
         {/* Results */}
