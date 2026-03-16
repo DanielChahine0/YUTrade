@@ -13,7 +13,7 @@ const CATEGORIES = ["All", "Textbooks", "Electronics", "Furniture", "Clothing", 
 
 export default function BrowsePage() {
   const navigate = useNavigate()
-  const { user, logout, isAuthenticated } = useContext(AuthContext)
+  const { logout, isAuthenticated } = useContext(AuthContext)
 
   const [listings, setListings] = useState<Listing[]>([])
   const [total, setTotal] = useState(0)

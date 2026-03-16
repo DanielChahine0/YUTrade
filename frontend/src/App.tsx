@@ -2,7 +2,7 @@
 // Phase: 1 (F1.6)
 
 import React from "react"
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
+import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { AuthProvider } from "./context/AuthContext"
 import RegisterPage from "./pages/RegisterPage"
 import VerifyPage from "./pages/VerifyPage"
