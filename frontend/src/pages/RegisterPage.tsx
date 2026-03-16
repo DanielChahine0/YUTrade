@@ -23,8 +23,9 @@
 // Link: "Already have an account? Log in" -> /login
 
 import React, { useState } from "react"
-import {useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { register } from "../api/auth"
+import { isYorkUEmail, isValidPassword } from "../utils/validators"
 
 const RegisterPage: React.FC = () => {
     const navigate = useNavigate()
@@ -34,26 +35,22 @@ const RegisterPage: React.FC = () => {
     const [confirmPassword, setConfirmPassword] = useState("")
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
-    const validateEmail = (email: string) => {
-        const domain = email.split("@")[1]
-        return domain === "my.yorku.ca" || domain === "yorku.ca"
-    }
-    const validatePassword = (pwd: string): string => {
-        if (pwd.length < 8) return "Password must be at least 8 characters"
-        return ""
-    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setError("")
-        if (!validateEmail(email)) {
+
+        if (!isYorkUEmail(email)) {
             setError("Must use a YorkU email (@my.yorku.ca or @yorku.ca)")
             return
         }
-        const pwdError = validatePassword(password)
-        if (pwdError) {
-            setError(pwdError)
+
+        const pwdCheck = isValidPassword(password)
+        if (!pwdCheck.valid) {
+            setError(pwdCheck.message)
             return
         }
+
         if (password !== confirmPassword) {
             setError("Passwords do not match")
             return
@@ -74,73 +71,75 @@ const RegisterPage: React.FC = () => {
             setLoading(false)
         }
     }
-     return (
-    <div className="auth-page">
-      <div className="auth-card">
-        <span className="yu-logo">YUTrade</span>
-        <h1 className="auth-title">Create Account</h1>
 
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <div className="auth-field">
-            <label className="auth-label">Full Name</label>
-            <input
-              className="auth-input"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-          </div>
+    return (
+        <div className="auth-page">
+            <div className="auth-card">
+                <span className="yu-logo">YUTrade</span>
+                <h1 className="auth-title">Create Account</h1>
 
-          <div className="auth-field">
-            <label className="auth-label">YorkU Email</label>
-            <input
-              className="auth-input"
-              type="email"
-              placeholder="you@my.yorku.ca"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
+                <form className="auth-form" onSubmit={handleSubmit}>
+                    <div className="auth-field">
+                        <label className="auth-label">Full Name</label>
+                        <input
+                            className="auth-input"
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            required
+                        />
+                    </div>
 
-          <div className="auth-field">
-            <label className="auth-label">Password</label>
-            <input
-              className="auth-input"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={8}
-            />
-          </div>
+                    <div className="auth-field">
+                        <label className="auth-label">YorkU Email</label>
+                        <input
+                            className="auth-input"
+                            type="email"
+                            placeholder="you@my.yorku.ca"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+                    </div>
 
-          <div className="auth-field">
-            <label className="auth-label">Confirm Password</label>
-            <input
-              className="auth-input"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              minLength={8}
-            />
-          </div>
+                    <div className="auth-field">
+                        <label className="auth-label">Password</label>
+                        <input
+                            className="auth-input"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </div>
 
-          {error && <p className="auth-error">{error}</p>}
+                    <div className="auth-field">
+                        <label className="auth-label">Confirm Password</label>
+                        <input
+                            className="auth-input"
+                            type="password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            required
+                        />
+                    </div>
 
-          <button className="btn-red" type="submit" disabled={loading}>
-            {loading ? "Registering…" : "Register"}
-          </button>
-           <label className="reg-text">Already have an existing account?</label>
-        <button className="btn-outline" type="button" onClick={() => navigate("/login")}>
-             Login
-       </button> 
-        </form>
-      </div>
-    </div>
-  )
+                    {error && <p className="auth-error">{error}</p>}
+
+                    <button className="btn-red" type="submit" disabled={loading}>
+                        {loading ? "Registering..." : "Register"}
+                    </button>
+
+                    <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+                        <p className="reg-text" style={{ marginBottom: '0.5rem' }}>Already have an account?</p>
+                        <button className="btn-outline" type="button" onClick={() => navigate("/login")}>
+                            Login
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    )
 }
 
 export default RegisterPage
