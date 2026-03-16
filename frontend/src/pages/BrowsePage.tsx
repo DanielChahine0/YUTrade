@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom"
 import { getListings } from "../api/listings"
 import { Listing } from "../types"
 import { AuthContext } from "../context/AuthContext"
+import { formatPrice } from "../utils/validators"
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000"
 const CATEGORIES = ["All", "Textbooks", "Electronics", "Furniture", "Clothing", "Other"]
@@ -132,7 +133,8 @@ export default function BrowsePage() {
                 </div>
                 <div className="listing-card-body">
                   <div className="listing-card-title">{listing.title}</div>
-                  <div className="listing-card-price">${listing.price.toFixed(2)}</div>
+                  {/* Used the formatPrice utility here */}
+                  <div className="listing-card-price">{formatPrice(listing.price)}</div>
                   {listing.category && (
                     <div className="listing-card-category">{listing.category}</div>
                   )}

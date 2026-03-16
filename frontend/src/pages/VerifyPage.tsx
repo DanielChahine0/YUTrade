@@ -17,9 +17,12 @@
 //   5. Show loading spinner while request is in flight
 //
 // Styling: Simple centered form with YU branding
+
+
 import { useState, useEffect, useRef } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { verify, resendVerification } from "../api/auth"
+import { isYorkUEmail } from "../utils/validators" // Added Import
 
 const CODE_LENGTH = 6
 const RESEND_SECONDS = 60
@@ -27,6 +30,7 @@ const RESEND_SECONDS = 60
 export default function VerifyPage() {
   const navigate = useNavigate()
   const location = useLocation()
+  
   const email = new URLSearchParams(location.search).get("email") || ""
 
   const [digits, setDigits] = useState<string[]>(Array(CODE_LENGTH).fill(""))
@@ -36,16 +40,23 @@ export default function VerifyPage() {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
 
   useEffect(() => {
+    if (!email || !isYorkUEmail(email)) {
+      navigate("/register")
+    }
+  }, [email, navigate])
+
+  useEffect(() => {
     if (countdown <= 0) return
     const t = setTimeout(() => setCountdown((c) => c - 1), 1000)
     return () => clearTimeout(t)
   }, [countdown])
 
   const handleChange = (i: number, val: string) => {
-    if (!/^\d?$/.test(val)) return
+    if (!/^\d?$/.test(val)) return // Only allow digits
     const next = [...digits]
     next[i] = val
     setDigits(next)
+ 
     if (val && i < CODE_LENGTH - 1) inputRefs.current[i + 1]?.focus()
   }
 
@@ -68,12 +79,14 @@ export default function VerifyPage() {
     e.preventDefault()
     const code = digits.join("")
     if (code.length < CODE_LENGTH) return
+    
     setError("")
     setLoading(true)
     try {
       await verify({ email, code })
+      // On success, go to login
       navigate("/login")
-    } catch {
+    } catch (err) {
       setError("Invalid or expired verification code")
     } finally {
       setLoading(false)
@@ -81,10 +94,12 @@ export default function VerifyPage() {
   }
 
   const handleResend = async () => {
+    setError("")
     try {
       await resendVerification(email)
       setCountdown(RESEND_SECONDS)
       setDigits(Array(CODE_LENGTH).fill(""))
+      inputRefs.current[0]?.focus()
     } catch {
       setError("Failed to resend code. Please try again.")
     }
@@ -94,17 +109,18 @@ export default function VerifyPage() {
     `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`
 
   return (
-    <div className="verify-page">
-      <div className="verify-card">
+    <div className="auth-page"> {/* Changed to auth-page for global style consistency */}
+      <div className="auth-card">
         <span className="yu-logo">YUTrade</span>
-        <h1 className="auth-title">Verify Email</h1>
-        <p style={{ fontSize: 12, color: '#666', textAlign: 'center', marginBottom: 8 }}>
-          We've sent a 6-digit verification code to your YorkU email.
+        <h1 className="auth-title">Verify Your Email</h1>
+        <p style={{ fontSize: 13, color: '#666', textAlign: 'center', marginBottom: 20 }}>
+          We've sent a code to <br />
+          <strong style={{ color: '#E31837' }}>{email}</strong>
         </p>
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="auth-field">
-            <label className="auth-label">Enter Verification Code</label>
+            <label className="auth-label">6-Digit Code</label>
             <div className="verify-boxes" onPaste={handlePaste}>
               {digits.map((d, i) => (
                 <input
@@ -124,25 +140,26 @@ export default function VerifyPage() {
 
           {error && <p className="auth-error">{error}</p>}
 
-          <p className="verify-countdown">
-            {countdown > 0 ? `Resend Code in ${fmt(countdown)}` : "You can resend now"}
+          <p className="verify-countdown" style={{ textAlign: 'center', fontSize: 13, marginBottom: 15 }}>
+            {countdown > 0 ? `Resend available in ${fmt(countdown)}` : "You can now resend the code"}
           </p>
-
-          <button
-            type="button"
-            className="btn-red"
-            onClick={handleResend}
-            disabled={countdown > 0}
-          >
-            Resend Code
-          </button>
 
           <button
             type="submit"
             className="btn-red"
+            style={{ marginBottom: 12 }}
             disabled={loading || digits.join("").length < CODE_LENGTH}
           >
-            {loading ? "Verifying…" : "Verify"}
+            {loading ? "Verifying..." : "Verify Account"}
+          </button>
+
+          <button
+            type="button"
+            className="btn-outline"
+            onClick={handleResend}
+            disabled={countdown > 0}
+          >
+            Resend Code
           </button>
         </form>
       </div>

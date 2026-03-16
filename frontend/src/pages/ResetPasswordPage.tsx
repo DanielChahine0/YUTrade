@@ -1,6 +1,8 @@
-import { useState, useRef } from "react"
+
+import { useState, useRef, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { resetPassword } from "../api/auth"
+import { isYorkUEmail, isValidPassword } from "../utils/validators" // Added Imports
 
 const CODE_LENGTH = 6
 
@@ -16,6 +18,12 @@ export default function ResetPasswordPage() {
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
+
+  useEffect(() => {
+    if (!email || !isYorkUEmail(email)) {
+      navigate("/forgot-password")
+    }
+  }, [email, navigate])
 
   const handleChange = (i: number, val: string) => {
     if (!/^\d?$/.test(val)) return
@@ -44,14 +52,18 @@ export default function ResetPasswordPage() {
     e.preventDefault()
     const code = digits.join("")
     if (code.length < CODE_LENGTH) return
-    if (newPassword.length < 8) {
-      setError("Password must be at least 8 characters")
+
+    const pwdCheck = isValidPassword(newPassword)
+    if (!pwdCheck.valid) {
+      setError(pwdCheck.message)
       return
     }
+
     if (newPassword !== confirmPassword) {
       setError("Passwords do not match")
       return
     }
+
     setError("")
     setLoading(true)
     try {
@@ -72,12 +84,15 @@ export default function ResetPasswordPage() {
   if (success) {
     return (
       <div className="auth-page">
-        <div className="verify-card">
+        <div className="auth-card">
           <span className="yu-logo">YUTrade</span>
-          <h1 className="auth-title">Password Reset!</h1>
-          <p style={{ textAlign: "center", color: "#2e7d32", fontSize: 14 }}>
-            Your password has been updated. Redirecting to login…
-          </p>
+          <h1 className="auth-title">Success!</h1>
+          <div style={{ textAlign: "center", padding: "20px 0" }}>
+             <p style={{ color: "#2e7d32", fontSize: 16, fontWeight: 600 }}>
+               Password updated.
+             </p>
+             <p style={{ color: "#666", fontSize: 13 }}>Redirecting to login...</p>
+          </div>
         </div>
       </div>
     )
@@ -85,16 +100,17 @@ export default function ResetPasswordPage() {
 
   return (
     <div className="auth-page">
-      <div className="verify-card">
+      <div className="auth-card">
         <span className="yu-logo">YUTrade</span>
-        <h1 className="auth-title">Reset Password</h1>
-        <p style={{ fontSize: 12, color: "#666", textAlign: "center", marginBottom: 8 }}>
-          Enter the 6-digit code sent to your email and choose a new password.
+        <h1 className="auth-title">New Password</h1>
+        <p style={{ fontSize: 13, color: "#666", textAlign: "center", marginBottom: 20 }}>
+          Enter the code sent to <br />
+          <strong style={{ color: '#E31837' }}>{email}</strong>
         </p>
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="auth-field">
-            <label className="auth-label">Reset Code</label>
+            <label className="auth-label">6-Digit Reset Code</label>
             <div className="verify-boxes" onPaste={handlePaste}>
               {digits.map((d, i) => (
                 <input
@@ -120,8 +136,7 @@ export default function ResetPasswordPage() {
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               required
-              minLength={8}
-              placeholder="At least 8 characters"
+              placeholder="Min 8 characters"
             />
           </div>
 
@@ -133,7 +148,6 @@ export default function ResetPasswordPage() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              minLength={8}
             />
           </div>
 
@@ -142,10 +156,12 @@ export default function ResetPasswordPage() {
           <button
             className="btn-red"
             type="submit"
+            style={{ marginBottom: 12 }}
             disabled={loading || digits.join("").length < CODE_LENGTH}
           >
-            {loading ? "Resetting…" : "Reset Password"}
+            {loading ? "Updating..." : "Update Password"}
           </button>
+          
           <button className="btn-outline" type="button" onClick={() => navigate(`/forgot-password?email=${encodeURIComponent(email)}`)}>
             Resend Code
           </button>

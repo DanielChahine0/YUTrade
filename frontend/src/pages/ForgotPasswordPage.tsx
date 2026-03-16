@@ -1,6 +1,8 @@
+
 import { useState } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { forgotPassword } from "../api/auth"
+import { isYorkUEmail } from "../utils/validators" // Added Import
 
 export default function ForgotPasswordPage() {
   const navigate = useNavigate()
@@ -15,10 +17,17 @@ export default function ForgotPasswordPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
+
+    if (!isYorkUEmail(email)) {
+      setError("Please enter a valid YorkU email (@yorku.ca or @my.yorku.ca)")
+      return
+    }
+
     setLoading(true)
     try {
       await forgotPassword({ email })
       setSent(true)
+      // Small delay so user can see the success message
       setTimeout(() => navigate(`/reset-password?email=${encodeURIComponent(email)}`), 1500)
     } catch (err: any) {
       if (err?.response?.status === 404) {
@@ -35,15 +44,18 @@ export default function ForgotPasswordPage() {
     <div className="auth-page">
       <div className="auth-card">
         <span className="yu-logo">YUTrade</span>
-        <h1 className="auth-title">Forgot Password</h1>
-        <p style={{ fontSize: 12, color: "#666", textAlign: "center", marginBottom: 8 }}>
-          Enter your YorkU email and we'll send you a 6-digit reset code.
+        <h1 className="auth-title">Reset Password</h1>
+        <p style={{ fontSize: 13, color: "#666", textAlign: "center", marginBottom: 20 }}>
+          Enter your YorkU email to receive a <br /> 6-digit verification code.
         </p>
 
         {sent ? (
-          <p style={{ textAlign: "center", color: "#2e7d32", fontSize: 14 }}>
-            Reset code sent! Redirecting…
-          </p>
+          <div style={{ textAlign: "center", padding: "20px 0" }}>
+            <p style={{ color: "#2e7d32", fontSize: 15, fontWeight: 600 }}>
+              Reset code sent!
+            </p>
+            <p style={{ color: "#666", fontSize: 13 }}>Redirecting to verification...</p>
+          </div>
         ) : (
           <form className="auth-form" onSubmit={handleSubmit}>
             <div className="auth-field">
@@ -51,7 +63,7 @@ export default function ForgotPasswordPage() {
               <input
                 className="auth-input"
                 type="email"
-                placeholder="you@my.yorku.ca"
+                placeholder="student@my.yorku.ca"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -60,9 +72,10 @@ export default function ForgotPasswordPage() {
 
             {error && <p className="auth-error">{error}</p>}
 
-            <button className="btn-red" type="submit" disabled={loading}>
-              {loading ? "Sending…" : "Send Reset Code"}
+            <button className="btn-red" type="submit" disabled={loading} style={{ marginBottom: 12 }}>
+              {loading ? "Sending..." : "Send Reset Code"}
             </button>
+            
             <button className="btn-outline" type="button" onClick={() => navigate("/login")}>
               Back to Login
             </button>
