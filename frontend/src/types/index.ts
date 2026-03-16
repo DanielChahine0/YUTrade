@@ -158,3 +158,23 @@ export interface ResetPasswordRequest {
   code: string;
   new_password: string;
 }
+
+export interface ListingCreateForm {
+  title: string;
+  description: string;
+  price: number;
+  category: string;
+  images: File[];
+}
+
+export interface MessageCreateRequest {
+  content: string;
+}
+
+export interface ListingUpdate {
+  title?: string;
+  description?: string;
+  price?: number;
+  category?: string;
+  status?: "active" | "sold" | "removed";
+}

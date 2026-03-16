@@ -26,12 +26,14 @@
 //   - Images should be image files (jpg, png, gif, webp)
 //   - Max file size: 5MB per image (client-side check)
 
+
+
 import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { createListing } from "../api/listings"
 import "../styles/global.css"
 import ImageUpload from "../components/ImageUpload"
-import { isValidPrice } from "../utils/validators" // Added import
+import { isValidPrice } from "../utils/validators"
 
 export default function CreateListingPage() {
   const navigate = useNavigate()
@@ -47,13 +49,11 @@ export default function CreateListingPage() {
     e.preventDefault()
     setError("")
 
-    // Basic Title Check
     if (!title.trim()) {
       setError("Title is required")
       return
     }
 
-    // Plugged in the isValidPrice helper
     if (!isValidPrice(price)) {
       setError("Price must be a valid number greater than $0.00")
       return
@@ -64,7 +64,6 @@ export default function CreateListingPage() {
     formData.append("description", description)
     formData.append("price", price)
     if (category) formData.append("category", category)
-    
     images.forEach((file) => formData.append("images", file))
 
     setLoading(true)
@@ -80,9 +79,8 @@ export default function CreateListingPage() {
 
   return (
     <div className="auth-page">
-      <div className="auth-card listing-card-form"> {/* Using the specific width from your CSS */}
+      <div className="auth-card listing-card-form">
         <h1 className="auth-title">Create Listing</h1>
-
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="auth-field">
             <label className="auth-label">Title *</label>

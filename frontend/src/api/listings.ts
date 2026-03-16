@@ -24,20 +24,35 @@
 //   - PATCH /listings/{id} with JSON body
 //   - Return response.data
 
-import client from "./client"
 
-export const getListings = (params: { search?: string; category?: string; status?: string; page?: number; limit?: number }) => {
-    return client.get("/listings", { params }).then((response) => response.data)
-}
+// listings.ts
+import client from "./client";
+import { Listing, PaginatedListings } from "../types";
+
+export const getListings = (params?: {
+  search?: string;
+  category?: string;
+  status?: string;
+  page?: number;
+  limit?: number;
+}) => {
+  return client.get<PaginatedListings>("/listings", { params }).then((res) => res.data);
+};
 
 export const getListing = (id: number) => {
-    return client.get(`/listings/${id}`).then((response) => response.data)
-}
+  return client.get<Listing>(`/listings/${id}`).then((res) => res.data);
+};
 
 export const createListing = (formData: FormData) => {
-    return client.post("/listings", formData).then((response) => response.data)
-}
+  // Do NOT set headers manually — let Axios handle multipart
+  return client.post<Listing>("/listings", formData).then((res) => res.data);
+};
 
-export const updateListing = (id: number, data: { title?: string; description?: string; price?: number; status?: string }) => {
-    return client.patch(`/listings/${id}`, data).then((response) => response.data)
-}
+export const updateListing = (id: number, data: {
+  title?: string;
+  description?: string;
+  price?: number;
+  status?: string;
+}) => {
+  return client.patch<Listing>(`/listings/${id}`, data).then((res) => res.data);
+};
