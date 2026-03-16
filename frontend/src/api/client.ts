@@ -21,9 +21,6 @@
 import axios from "axios"
 const apiclient = axios.create({
     baseURL: process.env.REACT_APP_API_URL || "http://localhost:8000",
-    headers: {
-        "Content-Type": "application/json",
-    },
 })
 apiclient.interceptors.request.use(
     (config) => {

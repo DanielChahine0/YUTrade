@@ -14,6 +14,7 @@ import SellerProfilePage from "./pages/SellerProfilePage"
 import BrowsePage from "./pages/BrowsePage"
 import ForgotPasswordPage from "./pages/ForgotPasswordPage"
 import ResetPasswordPage from "./pages/ResetPasswordPage"
+import EditListingPage from "./pages/EditListingPage"
 import ProtectedRoute from "./components/ProtectedRoute"
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/create" element={<ProtectedRoute><CreateListingPage /></ProtectedRoute>} />
           <Route path="/listings/:id" element={<ListingDetailPage />} />
+          <Route path="/listings/:id/edit" element={<ProtectedRoute><EditListingPage /></ProtectedRoute>} />
           <Route path="/my-listings" element={<ProtectedRoute><MyListingsPage /></ProtectedRoute>} />
           <Route path="/seller/:id" element={<SellerProfilePage />} />
         </Routes>

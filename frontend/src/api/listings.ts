@@ -38,6 +38,6 @@ export const createListing = (formData: FormData) => {
     return client.post("/listings", formData).then((response) => response.data)
 }
 
-export const updateListing = (id: number, data: { title?: string; description?: string; price?: number; status?: string }) => {
+export const updateListing = (id: number, data: { title?: string; description?: string; price?: number; category?: string; status?: string }) => {
     return client.patch(`/listings/${id}`, data).then((response) => response.data)
 }

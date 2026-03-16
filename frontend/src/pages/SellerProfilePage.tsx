@@ -33,6 +33,7 @@ export default function SellerProfilePage() {
   const [listings, setListings] = useState<Listing[]>([])
   const [loading, setLoading] = useState(true)
   const [sellerName, setSellerName] = useState("")
+  const [joinedYear, setJoinedYear] = useState<number | null>(null)
 
   useEffect(() => {
     getListings({})
@@ -43,6 +44,7 @@ export default function SellerProfilePage() {
         setListings(sellerListings)
         if (sellerListings.length > 0) {
           setSellerName(sellerListings[0].seller.name)
+          setJoinedYear(new Date(sellerListings[0].seller.created_at).getFullYear())
         }
       })
       .catch(() => {})
@@ -78,7 +80,7 @@ export default function SellerProfilePage() {
               <span>Rating</span>
               <StarRating rating={4} />
             </div>
-            <div className="seller-joined">Joined in 2017</div>
+            {joinedYear && <div className="seller-joined">Joined in {joinedYear}</div>}
             <button
               className="btn-red"
               style={{ width: "auto", padding: "7px 16px", fontSize: 12 }}

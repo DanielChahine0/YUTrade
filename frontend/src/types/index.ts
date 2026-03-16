@@ -93,7 +93,7 @@ export interface Image {
 export interface Listing {
   id: number;
   seller_id: number;
-  seller: { id: number; name: string; email: string };
+  seller: { id: number; name: string; email: string; created_at: string };
   title: string;
   description: string | null;
   price: number;
