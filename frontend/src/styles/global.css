@@ -1,40 +1,9 @@
 /* Assigned to: Harnaindeep Kaur */
 /* Phase: 1 (F1.9) */
-/*
- * TODO: Global styles for YU Trade.
- *
- * 1. Import variables: @import "./variables.css";
- *
- * 2. Reset/base styles:
- *    - *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
- *    - body { font-family: var(--font-family); color: var(--text-primary); background: var(--yu-light-grey); }
- *    - a { color: var(--yu-red); text-decoration: none; }
- *    - a:hover { text-decoration: underline; }
- *
- * 3. Common button styles:
- *    - .btn { padding, border-radius, cursor pointer, font-size }
- *    - .btn-primary { background: var(--yu-red); color: white; border: none; }
- *    - .btn-primary:hover { background: var(--yu-red-dark); }
- *    - .btn-secondary { background: white; color: var(--yu-dark-grey); border: 1px solid var(--yu-medium-grey); }
- *
- * 4. Form styles:
- *    - .form-group { margin-bottom: var(--spacing-md); }
- *    - .form-label { display: block; margin-bottom: var(--spacing-xs); font-weight: 600; }
- *    - .form-input { width: 100%; padding; border: 1px solid var(--yu-medium-grey); border-radius; }
- *    - .form-input:focus { outline: none; border-color: var(--yu-red); }
- *    - .form-error { color: var(--status-removed); font-size: 0.875rem; }
- *
- * 5. Layout helpers:
- *    - .container { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--spacing-md); }
- *    - .page-title { font-size: 1.5rem; margin-bottom: var(--spacing-lg); }
- *
- * 6. Utility classes:
- *    - .text-center { text-align: center; }
- *    - .mt-md { margin-top: var(--spacing-md); }
- *    - .loading-spinner { /* CSS spinner animation */ 
- /* *    - .error-message { color: var(--status-removed); padding; background: light red bg; border-radius; }
- *    - .success-message { color: var(--status-active); padding; background: light green bg; border-radius; }
- */ 
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -42,168 +11,225 @@
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f0f0f0;
-  color: #333;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Tahoma, Geneva, Verdana, sans-serif;
+  background: #f2f3f5;
+  color: #222;
+  -webkit-font-smoothing: antialiased;
 }
 
-.reg-text{
-    font-size: 12px;
-    color: #333;
+a {
+  color: #E31837;
+  text-decoration: none;
 }
-/* ── Auth pages (Login, Register) ── */
+
+/* ============================================================
+   FULL-WIDTH APP LAYOUT
+   ============================================================ */
+
+/* The outer shell — full viewport, no width cap */
+.app-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f2f3f5;
+}
+
+/* Top navigation bar — stretches the entire viewport */
+.app-header {
+  background: #E31837;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 0 40px;
+  height: 60px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  gap: 12px;
+}
+
+.app-header-title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  flex: 1;
+  text-align: center;
+}
+
+.app-header-btn {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 16px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: background 0.15s;
+  white-space: nowrap;
+  height: 34px;
+}
+
+.app-header-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Centered content container — content stays readable on wide monitors */
+.app-content {
+  flex: 1;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 28px 32px;
+}
+
+/* ============================================================
+   AUTH PAGES  (Login, Register, Forgot/Reset password)
+   ============================================================ */
 
 .auth-page {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f0f0f0;
+  background: #f2f3f5;
 }
 
 .auth-card {
   background: #fff;
-  border-radius: 8px;
-  padding: 32px 28px;
-  width: 280px;
-  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 14px;
+  padding: 40px 36px;
+  width: 400px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
 }
 
 .auth-title {
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 24px;
+  font-weight: 800;
   color: #E31837;
-  margin-bottom: 20px;
+  margin-bottom: 28px;
   text-align: center;
+  letter-spacing: -0.4px;
 }
 
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .auth-field {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
 }
 
 .auth-label {
-  font-size: 12px;
-  color: #333;
+  font-size: 11px;
+  font-weight: 700;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .auth-input {
-  padding: 6px 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 10px 12px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 8px;
   font-size: 14px;
   outline: none;
+  background: #fafafa;
+  color: #222;
+  transition: border-color 0.15s, background 0.15s;
+  width: 100%;
 }
 
 .auth-input:focus {
   border-color: #E31837;
+  background: #fff;
 }
 
 .auth-error {
-  font-size: 12px;
+  font-size: 13px;
   color: #c0392b;
   background: #fff5f5;
   border: 1px solid #ffd0d0;
-  border-radius: 4px;
-  padding: 6px 10px;
+  border-radius: 8px;
+  padding: 10px 14px;
 }
 
-/* Buttons */
+.reg-text {
+  font-size: 12px;
+  color: #555;
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
 
 .btn-red {
   width: 100%;
-  padding: 8px;
+  padding: 10px 16px;
   background: #E31837;
   color: #fff;
   border: none;
-  border-radius: 20px;
-  font-size: 13px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
+  transition: background 0.15s;
 }
 
-.btn-red:hover { background: #B8132D; }
-.btn-red:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-red:hover  { background: #B8132D; }
+.btn-red:active { opacity: 0.9; }
+.btn-red:disabled { opacity: 0.55; cursor: not-allowed; }
 
 .btn-outline {
   width: 100%;
-  padding: 7px;
+  padding: 10px 16px;
   background: #fff;
-  color: #333;
-  border: 1px solid #ccc;
-  border-radius: 20px;
-  font-size: 13px;
+  color: #444;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
 }
 
-.btn-outline:hover { border-color: #E31837; color: #E31837; }
+.btn-outline:hover    { border-color: #E31837; color: #E31837; }
+.btn-outline:disabled { opacity: 0.55; cursor: not-allowed; }
 
-.btn-outline {
-  width: 100%;
-  padding: 7px;
-  background: #fff;
-  color: #333;
-  border: 1px solid #ccc;
-  border-radius: 20px;
-  font-size: 13px;
-  cursor: pointer;
-}
+/* ============================================================
+   VERIFY PAGE
+   ============================================================ */
 
-/* ── Verify page ── */
 .verify-page {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f0f0f0;
+  background: #f2f3f5;
 }
 
 .verify-card {
   background: #fff;
-  border-radius: 8px;
-  padding: 32px 28px;
-  width: 400px;
-  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 14px;
+  padding: 40px 36px;
+  width: 460px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
 }
-/* ── Create Listing page ── */
-.listing-card {
-  width: 500px;
-}
-
-.listing-textarea {
-  resize: vertical;
-  min-height: 90px;
-  font-family: inherit;
-}
-
-.listing-select {
-  appearance: none;
-  cursor: pointer;
-}
-
-.listing-file-input {
-  font-size: 13px;
-  color: #555;
-  cursor: pointer;
-}
-
-.listing-file-count {
-  font-size: 12px;
-  color: #888;
-  margin-top: 2px;
-}
-
 
 .verify-logo {
   color: #E31837;
-  font-weight: 700;
+  font-weight: 800;
   font-size: 18px;
+  letter-spacing: -0.3px;
 }
 
 .verify-inner {
@@ -216,8 +242,9 @@ body {
 .verify-title {
   color: #E31837;
   font-size: 36px;
-  font-weight: 700;
+  font-weight: 800;
   margin-bottom: 10px;
+  letter-spacing: -1px;
 }
 
 .verify-subtitle {
@@ -241,18 +268,19 @@ body {
 
 .verify-boxes {
   display: flex;
-  flex-direction: row;
-  gap: 8px;
+  gap: 10px;
 }
+
 .verify-box {
-  width: 48px;
-  height: 52px;
-  border: 1.5px solid #ccc;
-  border-radius: 6px;
+  width: 52px;
+  height: 56px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
   text-align: center;
   font-size: 22px;
-  font-weight: 600;
+  font-weight: 700;
   outline: none;
+  transition: border-color 0.15s;
 }
 
 .verify-box:focus {
@@ -262,7 +290,7 @@ body {
 .verify-countdown {
   font-size: 13px;
   font-weight: 600;
-  color: #333;
+  color: #555;
 }
 
 .btn-disabled {
@@ -270,70 +298,146 @@ body {
   cursor: not-allowed;
 }
 
-/* ── YUTrade brand logo in auth cards ── */
+/* ============================================================
+   YUTrade BRAND LOGO
+   ============================================================ */
+
 .yu-logo {
   color: #E31837;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 800;
   letter-spacing: -0.3px;
   margin-bottom: 6px;
   display: block;
 }
 
-/* ── App Screen Layout (mobile-style pages) ── */
-.app-screen {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background: #fff;
-  max-width: 520px;
-  margin: 0 auto;
+/* ============================================================
+   CREATE LISTING PAGE
+   ============================================================ */
+
+/* Overrides auth-card width for the listing form */
+.listing-card-form {
+  width: 520px;
 }
 
-.app-header {
-  background: #E31837;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  flex-shrink: 0;
+.listing-textarea {
+  resize: vertical;
+  min-height: 96px;
+  font-family: inherit;
 }
 
-.app-header-title {
-  font-size: 17px;
-  font-weight: 700;
-  flex: 1;
-  text-align: center;
-}
-
-.app-header-btn {
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 20px;
+.listing-select {
+  appearance: none;
   cursor: pointer;
-  width: 30px;
-  height: 30px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+}
+
+.listing-file-input {
+  font-size: 13px;
+  color: #555;
+  cursor: pointer;
+}
+
+.listing-file-count {
+  font-size: 12px;
+  color: #888;
+  margin-top: 2px;
+}
+
+/* ============================================================
+   BROWSE PAGE — LISTINGS GRID
+   ============================================================ */
+
+.listings-grid {
+  display: grid;
+  /* Fills available columns; each card is at least 190px wide */
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 18px;
+}
+
+/* Individual listing card */
+.listing-card {
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.18s, transform 0.18s;
+  cursor: pointer;
+}
+
+.listing-card:hover {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
+  transform: translateY(-3px);
+}
+
+.listing-card-img {
+  width: 100%;
+  aspect-ratio: 1;
+  background: #f5f5f5;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
-  line-height: 1;
+  overflow: hidden;
 }
 
-.app-content {
-  flex: 1;
-  padding: 14px;
-  overflow-y: auto;
+.listing-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.25s ease;
 }
 
-/* ── Listing Detail Layout ── */
+.listing-card:hover .listing-card-img img {
+  transform: scale(1.05);
+}
+
+.listing-card-body {
+  padding: 10px 12px 14px;
+}
+
+.listing-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+}
+
+.listing-card-price {
+  font-size: 15px;
+  font-weight: 700;
+  color: #E31837;
+  margin-bottom: 3px;
+}
+
+.listing-card-category {
+  font-size: 11px;
+  color: #888;
+  margin-bottom: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.listing-card-seller {
+  font-size: 12px;
+  color: #aaa;
+}
+
+/* ============================================================
+   LISTING DETAIL PAGE
+   ============================================================ */
+
 .listing-detail-cols {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 14px;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 40px;
+  margin-bottom: 28px;
+  align-items: start;
 }
 
 /* ── Image Carousel ── */
@@ -347,8 +451,8 @@ body {
   width: 100%;
   aspect-ratio: 1;
   background: #f5f5f5;
-  border: 1.5px solid #ddd;
-  border-radius: 4px;
+  border: 1.5px solid #ebebeb;
+  border-radius: 12px;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -363,138 +467,147 @@ body {
 
 .carousel-img-placeholder {
   color: #ccc;
-  font-size: 40px;
+  font-size: 52px;
 }
 
 .carousel-dots {
   display: flex;
-  gap: 5px;
-  margin-top: 7px;
+  gap: 6px;
+  margin-top: 10px;
 }
 
 .carousel-dot {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: #ccc;
+  background: #ddd;
   cursor: pointer;
   border: none;
   padding: 0;
+  transition: background 0.15s;
 }
 
 .carousel-dot.active {
   background: #E31837;
 }
 
-/* ── Listing Detail fields ── */
+/* ── Detail fields ── */
 .detail-field-group {
-  margin-bottom: 7px;
+  margin-bottom: 10px;
 }
 
 .detail-label {
   font-size: 10px;
-  color: #888;
-  margin-bottom: 2px;
-  font-weight: 600;
+  color: #999;
+  margin-bottom: 3px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.5px;
 }
 
 .detail-value {
-  font-size: 12px;
+  font-size: 13px;
   color: #333;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 4px 7px;
-  background: #fff;
+  border: 1.5px solid #ebebeb;
+  border-radius: 8px;
+  padding: 7px 10px;
+  background: #fafafa;
   width: 100%;
   display: block;
 }
 
 .detail-title {
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 24px;
+  font-weight: 800;
   color: #111;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  letter-spacing: -0.4px;
+  line-height: 1.2;
 }
 
 .detail-desc {
-  font-size: 12px;
-  color: #666;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 5px 7px;
-  min-height: 56px;
+  font-size: 13px;
+  color: #555;
+  border: 1.5px solid #ebebeb;
+  border-radius: 8px;
+  padding: 8px 10px;
+  min-height: 72px;
   width: 100%;
   resize: none;
   font-family: inherit;
-  margin-bottom: 8px;
+  margin-bottom: 14px;
   background: #fafafa;
+  line-height: 1.55;
 }
 
-/* ── Star Rating ── */
+/* ============================================================
+   STAR RATING
+   ============================================================ */
+
 .star-row {
   display: flex;
-  gap: 1px;
+  gap: 2px;
   align-items: center;
 }
 
-.star-icon {
-  color: #FFB800;
-  font-size: 14px;
-}
+.star-icon       { color: #FFB800; font-size: 15px; }
+.star-icon-half  { color: #FFB800; font-size: 15px; opacity: 0.55; }
+.star-icon-empty { color: #e0e0e0; font-size: 15px; }
 
-.star-icon-half {
-  color: #FFB800;
-  font-size: 14px;
-  opacity: 0.6;
-}
+/* ============================================================
+   POSTED BY SECTION
+   ============================================================ */
 
-.star-icon-empty {
-  color: #ddd;
-  font-size: 14px;
-}
-
-/* ── Posted By Section ── */
 .posted-by-section {
   border-top: 1px solid #efefef;
-  padding-top: 12px;
+  padding-top: 18px;
 }
 
 .posted-by-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 18px;
   align-items: start;
 }
 
-/* ── Small red button (pill) ── */
+/* ============================================================
+   SMALL ACTION BUTTONS
+   ============================================================ */
+
 .btn-red-sm {
   display: block;
   width: 100%;
-  padding: 8px 12px;
+  padding: 10px 16px;
   background: #E31837;
   color: #fff;
   border: none;
-  border-radius: 20px;
-  font-size: 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
   text-align: center;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+  transition: background 0.15s;
 }
 
 .btn-red-sm:hover { background: #B8132D; }
 
 .timestamp-text {
   text-align: right;
-  font-size: 11px;
-  color: #aaa;
-  margin-top: 10px;
+  font-size: 12px;
+  color: #bbb;
+  margin-top: 14px;
 }
 
-/* ── My Listings Table ── */
+/* ============================================================
+   MY LISTINGS TABLE
+   ============================================================ */
+
 .listings-table-wrap {
   overflow-x: auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.07);
 }
 
 .listings-table {
@@ -506,105 +619,124 @@ body {
   text-align: left;
   font-size: 11px;
   color: #999;
-  padding: 7px 5px;
-  font-weight: 600;
-  border-bottom: 1.5px solid #eee;
+  padding: 14px 14px;
+  font-weight: 700;
+  border-bottom: 2px solid #f0f0f0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .listings-table td {
-  padding: 8px 5px;
+  padding: 12px 14px;
   border-bottom: 1px solid #f5f5f5;
-  font-size: 12px;
+  font-size: 13px;
   vertical-align: middle;
 }
 
+.listings-table tr:last-child td {
+  border-bottom: none;
+}
+
+.listings-table tbody tr:hover td {
+  background: #fafafa;
+}
+
 .listing-thumb {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   background: #f0f0f0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  object-fit: cover;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .listing-thumb img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 4px;
+  border-radius: 7px;
   display: block;
 }
 
 .status-pill {
   display: inline-block;
-  padding: 2px 9px;
+  padding: 3px 10px;
   border-radius: 20px;
-  font-size: 10px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   white-space: nowrap;
+  letter-spacing: 0.2px;
 }
 
-.status-pill-active { background: #222; color: #fff; }
-.status-pill-sold   { background: #eee; color: #777; }
-.status-pill-inactive { background: #eee; color: #777; }
+.status-pill-active   { background: #1a1a1a; color: #fff; }
+.status-pill-sold     { background: #f0f0f0; color: #888; }
+.status-pill-inactive { background: #f0f0f0; color: #888; }
 
 .btn-table-action {
   display: inline-block;
-  padding: 5px 10px;
-  border-radius: 20px;
-  font-size: 11px;
+  padding: 5px 13px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
   border: none;
   white-space: nowrap;
   background: #E31837;
   color: #fff;
-  margin-right: 4px;
+  margin-right: 6px;
+  transition: background 0.15s;
 }
 
 .btn-table-action:hover { background: #B8132D; }
 
-/* ── Seller Profile ── */
+/* ============================================================
+   SELLER PROFILE
+   ============================================================ */
+
 .seller-profile-top {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 14px;
+  gap: 24px;
   align-items: start;
-  padding-bottom: 14px;
+  padding-bottom: 24px;
   border-bottom: 1px solid #efefef;
-  margin-bottom: 14px;
+  margin-bottom: 24px;
 }
 
 .seller-avatar {
-  width: 84px;
-  height: 84px;
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
-  background: #ddd;
+  background: #ebebeb;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 32px;
+  font-size: 38px;
   color: #bbb;
   flex-shrink: 0;
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .seller-info-col {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .seller-name-input {
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 5px 8px;
-  font-size: 13px;
+  border: 1.5px solid #ebebeb;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 15px;
+  font-weight: 700;
   width: 100%;
   background: #fafafa;
-  color: #333;
+  color: #222;
   outline: none;
 }
 
@@ -612,118 +744,92 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
+  font-size: 13px;
   color: #555;
   font-weight: 600;
 }
 
 .seller-joined {
-  font-size: 12px;
+  font-size: 13px;
   color: #555;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .all-listings-title {
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 700;
-  color: #333;
-  margin-bottom: 10px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 8px;
+  color: #222;
+  margin-bottom: 14px;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 10px;
 }
 
-/* ── Image Upload component ── */
-.image-upload { display: flex; flex-direction: column; gap: 8px; }
+/* ============================================================
+   IMAGE UPLOAD COMPONENT
+   ============================================================ */
+
+.image-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
 .upload-area {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px dashed #ccc;
-  border-radius: 8px;
-  padding: 20px;
+  border: 2px dashed #d0d0d0;
+  border-radius: 10px;
+  padding: 24px 20px;
   cursor: pointer;
   font-size: 13px;
   color: #888;
+  background: #fafafa;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
-.upload-area:hover { border-color: #E31837; color: #E31837; }
+
+.upload-area:hover {
+  border-color: #E31837;
+  color: #E31837;
+  background: #fff8f8;
+}
+
 .upload-area input { display: none; }
 
-.image-previews { display: flex; flex-wrap: wrap; gap: 8px; }
-
-.image-preview img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; }
-.image-preview button {
-  position: absolute; top: -6px; right: -6px;
-  background: #E31837; color: #fff;
-  border: none; border-radius: 50%;
-  width: 18px; height: 18px;
-  font-size: 12px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-}
+.image-previews { display: flex; flex-wrap: wrap; gap: 10px; }
 
 .image-preview {
   position: relative;
-  width: 56px;
-  height: 56px;
-}
-
-/* ── Browse Page ── */
-.listings-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-
-.listing-card {
-  background: #fff;
+  width: 64px;
+  height: 64px;
   border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-  transition: box-shadow 0.15s;
+  overflow: visible;
 }
 
-.listing-card:hover {
-  box-shadow: 0 3px 10px rgba(0,0,0,0.14);
-}
-
-.listing-card-img {
+.image-preview img {
   width: 100%;
-  aspect-ratio: 1;
-  background: #f5f5f5;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+}
+
+.image-preview button {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  background: #E31837;
+  color: #fff;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  transition: background 0.15s;
 }
 
-.listing-card-body {
-  padding: 8px 10px;
-}
-
-.listing-card-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: #222;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-bottom: 2px;
-}
-
-.listing-card-price {
-  font-size: 14px;
-  font-weight: 700;
-  color: #E31837;
-  margin-bottom: 2px;
-}
-
-.listing-card-category {
-  font-size: 11px;
-  color: #888;
-  margin-bottom: 2px;
-}
-
-.listing-card-seller {
-  font-size: 11px;
-  color: #aaa;
-}
+.image-preview button:hover { background: #B8132D; }

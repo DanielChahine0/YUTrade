@@ -51,11 +51,11 @@ export default function MyListingsPage() {
     <div className="app-screen">
       <div className="app-header">
         <button className="app-header-btn" onClick={() => navigate(-1)}>
-          ←
+          ← Back
         </button>
         <span className="app-header-title">My Listings</span>
-        <button className="app-header-btn" onClick={() => navigate("/my-listings")}>
-          👤
+        <button className="app-header-btn" onClick={() => navigate("/create")}>
+          + New Listing
         </button>
       </div>
 
