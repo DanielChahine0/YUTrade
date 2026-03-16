@@ -1,13 +1,12 @@
 // Assigned to: Harnaindeep Kaur
 // Phase: 2 (F2.6)
 
-
 import React, { useState, useEffect, useContext } from "react"
 import { useNavigate } from "react-router-dom"
 import { getListings, updateListing } from "../api/listings"
 import { Listing } from "../types"
 import { AuthContext } from "../context/AuthContext"
-import { formatPrice } from "../utils/validators" // Added import
+import { formatPrice } from "../utils/validators"
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000"
 
@@ -26,17 +25,16 @@ function statusClass(status: string) {
 export default function MyListingsPage() {
   const { user } = useContext(AuthContext)
   const navigate = useNavigate()
+
   const [listings, setListings] = useState<Listing[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Only fetch if user is logged in
-    if (!user?.id) return;
+    if (!user?.id) return
 
     getListings({})
       .then((data) => {
         const all: Listing[] = data.listings || []
-        // Filter to only show items belonging to this student
         setListings(all.filter((l) => l.seller_id === user?.id))
       })
       .catch(() => {})
@@ -45,6 +43,7 @@ export default function MyListingsPage() {
 
   const handleDelete = async (id: number) => {
     if (!window.confirm("Are you sure you want to remove this listing?")) return
+
     try {
       await updateListing(id, { status: "removed" })
       setListings((prev) => prev.filter((l) => l.id !== id))
@@ -55,25 +54,55 @@ export default function MyListingsPage() {
 
   return (
     <div className="app-content">
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-        <h1 className="auth-title" style={{ margin: 0, textAlign: 'left' }}>My Listings</h1>
-        <button className="btn-red" style={{ width: "auto" }} onClick={() => navigate("/create")}>
-          + Create New
-        </button>
+
+      {/* Header */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 24
+        }}
+      >
+        <h1 className="auth-title" style={{ margin: 0, textAlign: "left" }}>
+          My Listings
+        </h1>
+
+        {!loading && listings.length > 0 && (
+          <button
+            className="btn-red"
+            style={{ width: "auto" }}
+            onClick={() => navigate("/create")}
+          >
+            + Create New
+          </button>
+        )}
       </div>
 
       {loading ? (
-        <p style={{ textAlign: "center", paddingTop: 48, color: "#aaa" }}>Loading...</p>
+        <p style={{ textAlign: "center", paddingTop: 48, color: "#aaa" }}>
+          Loading...
+        </p>
       ) : listings.length === 0 ? (
+
+        /* EMPTY STATE */
         <div style={{ textAlign: "center", paddingTop: 48 }}>
           <p style={{ color: "#888", marginBottom: 16 }}>
             You haven't created any listings yet.
           </p>
-          <button className="btn-red" style={{ width: "auto", padding: "8px 20px" }} onClick={() => navigate("/create")}>
+
+          <button
+            className="btn-red"
+            style={{ width: "auto", padding: "8px 20px" }}
+            onClick={() => navigate("/create")}
+          >
             Post Your First Item
           </button>
         </div>
+
       ) : (
+
+        /* LISTINGS TABLE */
         <div className="listings-table-wrap">
           <table className="listings-table">
             <thead>
@@ -83,14 +112,16 @@ export default function MyListingsPage() {
                 <th>Price</th>
                 <th>Category</th>
                 <th>Status</th>
-                <th style={{ textAlign: 'right' }}>Actions</th>
+                <th style={{ textAlign: "right" }}>Actions</th>
               </tr>
             </thead>
+
             <tbody>
               {listings.map((listing) => {
                 const firstImg = [...listing.images].sort(
                   (a, b) => a.position - b.position
                 )[0]
+
                 return (
                   <tr key={listing.id}>
                     <td>
@@ -101,32 +132,45 @@ export default function MyListingsPage() {
                             alt={listing.title}
                           />
                         ) : (
-                          <span style={{ color: "#ccc", fontSize: 12 }}>No Image</span>
+                          <span style={{ color: "#ccc", fontSize: 12 }}>
+                            No Image
+                          </span>
                         )}
                       </div>
                     </td>
+
                     <td
-                      style={{ fontWeight: 600, cursor: "pointer", color: "#E31837" }}
+                      style={{
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        color: "#E31837"
+                      }}
                       onClick={() => navigate(`/listings/${listing.id}`)}
                     >
                       {listing.title}
                     </td>
-                    {/* Plugged in formatPrice here */}
-                    <td style={{ fontWeight: 700 }}>{formatPrice(listing.price)}</td>
+
+                    <td style={{ fontWeight: 700 }}>
+                      {formatPrice(listing.price)}
+                    </td>
+
                     <td>{listing.category || "Other"}</td>
+
                     <td>
                       <span className={statusClass(listing.status)}>
                         {statusLabel(listing.status)}
                       </span>
                     </td>
-                    <td style={{ textAlign: 'right', whiteSpace: "nowrap" }}>
+
+                    <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
                       <button
                         className="btn-table-action"
-                        style={{ background: '#444' }} // Secondary color for Edit
+                        style={{ background: "#444" }}
                         onClick={() => navigate(`/listings/${listing.id}/edit`)}
                       >
                         Edit
                       </button>
+
                       <button
                         className="btn-table-action"
                         onClick={() => handleDelete(listing.id)}
@@ -140,6 +184,7 @@ export default function MyListingsPage() {
             </tbody>
           </table>
         </div>
+
       )}
     </div>
   )
