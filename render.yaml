@@ -1,6 +1,7 @@
 services:
   # ── Backend (FastAPI) ──────────────────────────────────────────────────────
   - type: web
+    plan: free
     name: yutrade-api
     runtime: python
     rootDir: backend
