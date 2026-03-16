@@ -63,7 +63,6 @@ export default function ResetPasswordPage() {
       setError("Passwords do not match")
       return
     }
-
     setError("")
     setLoading(true)
     try {

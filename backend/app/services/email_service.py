@@ -39,7 +39,8 @@ def send_password_reset_email(email: str, code: str) -> None:
         )
 
         try:
-            asyncio.run(
+            loop = asyncio.new_event_loop()
+            loop.run_until_complete(
                 aiosmtplib.send(
                     msg,
                     hostname=settings.SMTP_HOST,
@@ -49,6 +50,7 @@ def send_password_reset_email(email: str, code: str) -> None:
                     start_tls=True,
                 )
             )
+            loop.close()
             print(f"[SMTP] Password reset email sent to {email}")
         except Exception as e:
             print(f"[SMTP ERROR] Failed to send reset email to {email}: {e}")
@@ -75,7 +77,8 @@ def send_verification_email(email: str, code: str) -> None:
         )
 
         try:
-            asyncio.run(
+            loop = asyncio.new_event_loop()
+            loop.run_until_complete(
                 aiosmtplib.send(
                     msg,
                     hostname=settings.SMTP_HOST,
@@ -85,6 +88,7 @@ def send_verification_email(email: str, code: str) -> None:
                     start_tls=True,
                 )
             )
+            loop.close()
             print(f"[SMTP] Verification email sent to {email}")
         except Exception as e:
             print(f"[SMTP ERROR] Failed to send email to {email}: {e}")

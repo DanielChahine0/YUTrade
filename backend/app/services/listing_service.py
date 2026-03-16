@@ -39,6 +39,7 @@ from uuid import uuid4
 from sqlalchemy import or_
 from sqlalchemy.orm import Session, joinedload
 
+from app.config import settings
 from app.models.image import Image
 from app.models.listing import Listing
 
@@ -74,7 +75,7 @@ def create_listing(
             ext = image.filename.rsplit(".", 1)[1]
 
         filename = f"{uuid4()}.{ext}" if ext else str(uuid4())
-        disk_path = os.path.join("uploads", filename)
+        disk_path = os.path.join(settings.UPLOAD_DIR, filename)
 
         with open(disk_path, "wb") as file_object:
             file_object.write(image.file.read())

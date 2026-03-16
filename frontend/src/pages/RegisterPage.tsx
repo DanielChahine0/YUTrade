@@ -55,7 +55,6 @@ const RegisterPage: React.FC = () => {
             setError("Passwords do not match")
             return
         }
-
         setLoading(true)
         try {
             await register({ name, email, password })

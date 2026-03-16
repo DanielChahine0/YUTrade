@@ -25,7 +25,6 @@ function statusClass(status: string) {
 export default function MyListingsPage() {
   const { user } = useContext(AuthContext)
   const navigate = useNavigate()
-
   const [listings, setListings] = useState<Listing[]>([])
   const [loading, setLoading] = useState(true)
 

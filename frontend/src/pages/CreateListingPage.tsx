@@ -48,7 +48,6 @@ export default function CreateListingPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
-
     if (!title.trim()) {
       setError("Title is required")
       return
@@ -65,7 +64,6 @@ export default function CreateListingPage() {
     formData.append("price", price)
     if (category) formData.append("category", category)
     images.forEach((file) => formData.append("images", file))
-
     setLoading(true)
     try {
       const newListing = await createListing(formData)

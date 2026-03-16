@@ -1,7 +1,6 @@
 // Phase: 2 (F2.5)
 // Seller profile view — shows seller info and all their listings.
 
-
 import React, { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { getListings } from "../api/listings"
