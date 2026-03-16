@@ -13,7 +13,8 @@ YUTrade is a York University marketplace app (EECS 4314 course project) — a Fa
 cd backend
 source venv/bin/activate  # or: source ../.venv/bin/activate
 uvicorn app.main:app --reload  # dev server at http://localhost:8000
-pytest tests/                  # run tests
+pytest tests/                  # run all tests
+pytest tests/test_auth.py      # run a single test file
 # API docs at http://localhost:8000/docs
 ```
 
@@ -59,14 +60,20 @@ Key behaviors:
 ### Auth Flow
 1. Register → 6-digit code emailed → verify → account active
 2. Login → JWT returned → stored in localStorage → auto-injected on all requests
-3. `resend-verification` endpoint available at `POST /auth/resend-verification`
+3. `resend-verification` endpoint: `POST /auth/resend-verification`
+4. Password reset: `POST /auth/forgot-password` → code emailed → `POST /auth/reset-password`
+- Both `@my.yorku.ca` and `@yorku.ca` email domains are accepted at registration
 
 ### Data Model
 - `users` → `listings` (one-to-many) → `images` (cascade delete)
-- `messages` link sender, receiver, and listing_id
+- `messages` link sender, receiver, and listing_id; message routes are nested under `/listings/{id}/messages`
 - Listing statuses: `active`, `sold`, `removed`
 
 ### API Conventions
 - Multipart form-data for image uploads; JSON for everything else
 - Optional auth on public GET endpoints (listing browse/detail)
 - Errors use standard HTTP codes (400/401/403/404/409) with `{"detail": "..."}` body
+
+### Testing
+- Tests use in-memory SQLite with `StaticPool` — `conftest.py` provides `client`, `db_session`, `auth_headers`, and `second_auth_headers` fixtures
+- Fixtures register/verify/login real users against the test DB (no mocking of auth)

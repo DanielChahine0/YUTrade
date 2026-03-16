@@ -25,6 +25,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+from app.config import settings
 from app.database import Base, engine
 from app.models import User, VerificationCode, PasswordResetCode, Listing, Image, Message  # noqa: F401 — register models
 from app.routers.auth import router as auth_router
@@ -40,20 +41,20 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="YU Trade API", lifespan=lifespan)
 
-# CORS middleware for React dev server
+# CORS middleware — origins controlled via ALLOWED_ORIGINS env var
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=settings.ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # Ensure uploads directory exists
-os.makedirs("uploads", exist_ok=True)
+os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 
 # Mount static files for uploaded images
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads")
 
 # Include routers
 app.include_router(auth_router, prefix="/auth", tags=["Auth"])
