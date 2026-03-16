@@ -1,0 +1,23 @@
+/* Assigned to: Harnaindeep Kaur */
+/* Phase: 1 (F1.9) */
+
+:root {
+  /* York University Branding */
+  --yu-red: #E31837;
+  --yu-black: #000000;
+  --yu-white: #ffffff;
+
+  /* Secondary Colors */
+  --gray-100: #f8f9fa;
+  --gray-200: #e9ecef;
+  --gray-800: #343a40;
+  
+  /* Status Colors */
+  --error-red: #d32f2f;
+  --success-green: #2e7d32;
+
+  /* Layout Constants */
+  --radius: 8px;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --transition: all 0.2s ease-in-out;
+}
