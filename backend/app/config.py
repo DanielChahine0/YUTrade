@@ -68,6 +68,16 @@ class Settings:
             os.getenv("VERIFICATION_CODE_EXPIRE_MINUTES", "") or "15"
         )
 
+        self.ALLOWED_ORIGINS: list[str] = [
+            o.strip()
+            for o in (
+                os.getenv("ALLOWED_ORIGINS", "http://localhost:3000")
+            ).split(",")
+            if o.strip()
+        ]
+
+        self.UPLOAD_DIR: str = os.getenv("UPLOAD_DIR", "uploads")
+
         # Optional: enforce secure secret in production
         if self.SECRET_KEY == "dev-secret-key-change-in-production":
             print("⚠️ Warning: Using default SECRET_KEY. Change this in production.")
