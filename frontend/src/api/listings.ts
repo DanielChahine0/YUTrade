@@ -52,6 +52,7 @@ export const updateListing = (id: number, data: {
   title?: string;
   description?: string;
   price?: number;
+  category?: string;
   status?: string;
 }) => {
   return client.patch<Listing>(`/listings/${id}`, data).then((res) => res.data);

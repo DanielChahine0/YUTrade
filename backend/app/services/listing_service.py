@@ -180,6 +180,9 @@ def update_listing(
     if update_data.price is not None:
         listing.price = update_data.price
 
+    if update_data.category is not None:
+        listing.category = update_data.category
+
     if update_data.status is not None:
         listing.status = update_data.status
 
