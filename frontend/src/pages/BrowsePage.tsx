@@ -1,19 +1,16 @@
 // Assigned to: Harnaindeep Kaur
 // Phase: 2 (F2.3)
 
-import React, { useState, useEffect, useContext } from "react"
+import React, { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { getListings } from "../api/listings"
 import { Listing } from "../types"
-import { AuthContext } from "../context/AuthContext"
-import { formatPrice } from "../utils/validators"
+import ListingCard from "../components/ListingCard" // Extracted for F2.2
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000"
 const CATEGORIES = ["All", "Textbooks", "Electronics", "Furniture", "Clothing", "Other"]
 
 export default function BrowsePage() {
   const navigate = useNavigate()
-  const { isAuthenticated } = useContext(AuthContext)
 
   const [listings, setListings] = useState<Listing[]>([])
   const [total, setTotal] = useState(0)
@@ -41,7 +38,7 @@ export default function BrowsePage() {
         setListings(data.listings || [])
         setTotal(data.total || 0)
       })
-      .catch(() => setError("Failed to load listings"))
+      .catch(() => setError("Failed to load listings. Please try again later."))
       .finally(() => setLoading(false))
   }, [page, search, category])
 
@@ -59,8 +56,8 @@ export default function BrowsePage() {
   return (
     <div className="app-content">
       {/* Search + filter row */}
-      <div style={{ display: "flex", gap: 12, marginBottom: 18, alignItems: "center", flexWrap: "wrap" }}>
-        <form onSubmit={handleSearch} style={{ display: "flex", gap: 8, flex: "1 1 280px", minWidth: 0 }}>
+      <div style={{ display: "flex", gap: 12, marginBottom: 24, alignItems: "center", flexWrap: "wrap" }}>
+        <form onSubmit={handleSearch} style={{ display: "flex", gap: 8, flex: "1 1 280px" }}>
           <input
             className="auth-input"
             style={{ flex: 1, marginBottom: 0 }}
@@ -69,13 +66,13 @@ export default function BrowsePage() {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
           />
-          <button className="btn-red" type="submit" style={{ width: "auto", padding: "0 20px", flexShrink: 0 }}>
+          <button className="btn-red" type="submit" style={{ width: "auto", padding: "0 24px" }}>
             Search
           </button>
         </form>
 
         {/* Category filters */}
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           {CATEGORIES.map((cat) => {
             const active = (cat === "All" && !category) || cat === category
             return (
@@ -83,16 +80,16 @@ export default function BrowsePage() {
                 key={cat}
                 onClick={() => handleCategoryChange(cat)}
                 style={{
-                  padding: "6px 14px",
-                  borderRadius: 20,
+                  padding: "8px 16px",
+                  borderRadius: "var(--radius-pill)",
                   border: "1.5px solid",
-                  borderColor: active ? "#E31837" : "#ddd",
-                  background: active ? "#E31837" : "#fff",
-                  color: active ? "#fff" : "#555",
+                  borderColor: active ? "var(--yu-red)" : "var(--border-color)",
+                  background: active ? "var(--yu-red)" : "var(--yu-white)",
+                  color: active ? "var(--yu-white)" : "var(--text-muted)",
                   cursor: "pointer",
-                  fontSize: 13,
+                  fontSize: 14,
                   fontWeight: active ? 600 : 400,
-                  transition: "all 0.15s",
+                  transition: "var(--transition)",
                 }}
               >
                 {cat}
@@ -104,65 +101,40 @@ export default function BrowsePage() {
 
       {/* Results */}
       {loading ? (
-        <p style={{ textAlign: "center", paddingTop: 48, color: "#aaa" }}>Loading...</p>
+        <p style={{ textAlign: "center", padding: "48px 0", color: "var(--text-muted)" }}>Loading listings...</p>
       ) : error ? (
-        <p style={{ textAlign: "center", paddingTop: 48, color: "#888" }}>{error}</p>
+        <p style={{ textAlign: "center", padding: "48px 0", color: "var(--error-red)" }}>{error}</p>
       ) : listings.length === 0 ? (
-        <p style={{ textAlign: "center", paddingTop: 48, color: "#888" }}>No listings found.</p>
+        <p style={{ textAlign: "center", padding: "48px 0", color: "var(--text-muted)" }}>No listings found in this category.</p>
       ) : (
         <div className="listings-grid">
-          {listings.map((listing) => {
-            const firstImg = [...listing.images].sort((a, b) => a.position - b.position)[0]
-            return (
-              <div
-                key={listing.id}
-                className="listing-card"
-                onClick={() => navigate(`/listings/${listing.id}`)}
-                style={{ cursor: "pointer" }}
-              >
-                <div className="listing-card-img">
-                  {firstImg ? (
-                    <img
-                      src={`${API_URL}/${firstImg.file_path}`}
-                      alt={listing.title}
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                    />
-                  ) : (
-                    <div style={{ color: "#ccc", fontSize: 14 }}>No Image</div>
-                  )}
-                </div>
-                <div className="listing-card-body">
-                  <div className="listing-card-title">{listing.title}</div>
-                  {/* Used the formatPrice utility here */}
-                  <div className="listing-card-price">{formatPrice(listing.price)}</div>
-                  {listing.category && (
-                    <div className="listing-card-category">{listing.category}</div>
-                  )}
-                  <div className="listing-card-seller">Seller: {listing.seller.name}</div>
-                </div>
-              </div>
-            )
-          })}
+          {listings.map((listing) => (
+            <ListingCard 
+              key={listing.id} 
+              listing={listing} 
+              onClick={() => navigate(`/listings/${listing.id}`)} 
+            />
+          ))}
         </div>
       )}
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div style={{ display: "flex", justifyContent: "center", gap: 8, marginTop: 24 }}>
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 16, marginTop: 40 }}>
           <button
             className="btn-outline"
-            style={{ width: "auto", padding: "6px 16px" }}
+            style={{ width: "auto", padding: "8px 20px" }}
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
           >
             Previous
           </button>
-          <span style={{ lineHeight: "36px", fontSize: 14, color: "#555" }}>
-            {page} / {totalPages}
+          <span style={{ fontSize: 14, color: "var(--text-main)", fontWeight: 500 }}>
+            Page {page} of {totalPages}
           </span>
           <button
             className="btn-outline"
-            style={{ width: "auto", padding: "6px 16px" }}
+            style={{ width: "auto", padding: "8px 20px" }}
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
           >

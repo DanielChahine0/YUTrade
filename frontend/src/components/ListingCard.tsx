@@ -31,50 +31,51 @@
 
 
 
-import React from "react"
-import { useNavigate } from "react-router-dom"
-import { Listing } from "../types"
+import React from 'react';
+import { Listing } from '../types';
+import { formatPrice, formatDate } from '../utils/validators'; // Added formatDate here
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000"
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
-interface ListingCardProps {
-  listing: Listing
+interface Props {
+  listing: Listing;
+  onClick: () => void;
 }
 
-const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
-  const navigate = useNavigate()
-
-  const formattedDate = new Date(listing.created_at).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  })
+export default function ListingCard({ listing, onClick }: Props) {
+  const images = listing.images || [];
+  const firstImg = [...images].sort((a, b) => a.position - b.position)[0];
 
   return (
-    <div className="listing-card" onClick={() => navigate(`/listings/${listing.id}`)}>
+    <div className="listing-card" onClick={onClick} style={{ cursor: "pointer" }}>
       <div className="listing-card-img">
-        {listing.images?.length > 0 ? (
-          <img
-            src={`${API_URL}/${listing.images[0].file_path}`}
-            alt={listing.title}
-            onError={(e) => {
-              (e.target as HTMLImageElement).src =
-                "https://via.placeholder.com/300?text=No+Image"
-            }}
+        {firstImg ? (
+          <img 
+            src={`${API_URL}/${firstImg.file_path}`} 
+            alt={listing.title} 
+            loading="lazy" 
           />
         ) : (
           <div className="no-image-placeholder">No Image</div>
         )}
       </div>
-
+      
       <div className="listing-card-body">
         <h3 className="listing-card-title">{listing.title}</h3>
-        <p className="listing-card-price">${listing.price.toFixed(2)}</p>
-        {listing.category && <p className="listing-card-category">{listing.category}</p>}
-        <p className="listing-card-date">{formattedDate}</p>
+        <p className="listing-card-price">{formatPrice(listing.price)}</p>
+        
+        <div className="listing-card-meta">
+          {listing.category && (
+            <span className="listing-card-tag">{listing.category}</span>
+          )}
+          {/* Using your utility function here */}
+          <span className="listing-card-date">{formatDate(listing.created_at)}</span>
+        </div>
+        
+        <div className="listing-card-footer">
+          Seller: {listing.seller.name}
+        </div>
       </div>
     </div>
-  )
+  );
 }
-
-export default ListingCard

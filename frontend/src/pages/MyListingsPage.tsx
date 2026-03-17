@@ -1,6 +1,9 @@
 // Assigned to: Harnaindeep Kaur
 // Phase: 2 (F2.6)
 
+/* Assigned to: Harnaindeep Kaur */
+/* Phase: 2 (F2.6) */
+
 import React, { useState, useEffect, useContext } from "react"
 import { useNavigate } from "react-router-dom"
 import { getListings, updateListing } from "../api/listings"
@@ -67,6 +70,7 @@ export default function MyListingsPage() {
           My Listings
         </h1>
 
+        {/* ONLY show this button if not loading AND they already have listings */}
         {!loading && listings.length > 0 && (
           <button
             className="btn-red"
@@ -84,7 +88,7 @@ export default function MyListingsPage() {
         </p>
       ) : listings.length === 0 ? (
 
-        /* EMPTY STATE */
+        /* EMPTY STATE - Shown only if listings.length is 0 */
         <div style={{ textAlign: "center", paddingTop: 48 }}>
           <p style={{ color: "#888", marginBottom: 16 }}>
             You haven't created any listings yet.
@@ -101,7 +105,7 @@ export default function MyListingsPage() {
 
       ) : (
 
-        /* LISTINGS TABLE */
+        /* LISTINGS TABLE - Shown only if they have postings */
         <div className="listings-table-wrap">
           <table className="listings-table">
             <thead>
@@ -117,9 +121,9 @@ export default function MyListingsPage() {
 
             <tbody>
               {listings.map((listing) => {
-                const firstImg = [...listing.images].sort(
-                  (a, b) => a.position - b.position
-                )[0]
+                const firstImg = listing.images && listing.images.length > 0
+                  ? [...listing.images].sort((a, b) => a.position - b.position)[0]
+                  : null
 
                 return (
                   <tr key={listing.id}>
@@ -164,7 +168,7 @@ export default function MyListingsPage() {
                     <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
                       <button
                         className="btn-table-action"
-                        style={{ background: "#444" }}
+                        style={{ background: "#444", marginRight: 6 }}
                         onClick={() => navigate(`/listings/${listing.id}/edit`)}
                       >
                         Edit
