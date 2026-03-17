@@ -93,7 +93,7 @@ export interface Image {
 export interface Listing {
   id: number;
   seller_id: number;
-  seller: { id: number; name: string; email: string };
+  seller: { id: number; name: string; email: string; created_at: string };
   title: string;
   description: string | null;
   price: number;
@@ -157,18 +157,6 @@ export interface ResetPasswordRequest {
   email: string;
   code: string;
   new_password: string;
-}
-
-export interface ListingCreateForm {
-  title: string;
-  description: string;
-  price: number;
-  category: string;
-  images: File[];
-}
-
-export interface MessageCreateRequest {
-  content: string;
 }
 
 export interface ListingUpdate {

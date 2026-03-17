@@ -38,18 +38,18 @@ export default function SellerProfilePage() {
 
   useEffect(() => {
     if (!id) return
-    
+
     getListings({})
       .then((data) => {
         const all: Listing[] = data.listings || []
         const sellerId = parseInt(id)
         const sellerListings = all.filter((l) => l.seller_id === sellerId)
-        
+
         setListings(sellerListings)
-        
+
         if (sellerListings.length > 0) {
           setSellerName(sellerListings[0].seller.name)
-          setMemberSince(sellerListings[0].created_at)
+          setMemberSince(sellerListings[0].seller.created_at)
         }
       })
       .catch(() => {})
@@ -65,7 +65,7 @@ export default function SellerProfilePage() {
         </div>
         <div className="seller-info-col">
           <h1 className="detail-title" style={{ margin: 0 }}>{sellerName || "York Student"}</h1>
-          
+
           <div className="seller-rating-row" style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '8px 0' }}>
             <span className="detail-label" style={{ marginBottom: 0 }}>Rating</span>
             <StarRating rating={4} />
@@ -91,7 +91,7 @@ export default function SellerProfilePage() {
       <h2 className="auth-title" style={{ textAlign: 'left', fontSize: 18, marginBottom: 16 }}>
         All Seller Listings
       </h2>
-      
+
       {loading ? (
         <p style={{ textAlign: "center", color: "#aaa", paddingTop: 24 }}>Loading...</p>
       ) : listings.length === 0 ? (
@@ -131,12 +131,12 @@ export default function SellerProfilePage() {
                       </div>
                     </td>
                     <td style={{ fontWeight: 600 }}>{listing.title}</td>
-                    
+
                     {/* Consistent formatPrice Plug */}
                     <td style={{ fontWeight: 700, color: '#E31837' }}>
                       {formatPrice(listing.price)}
                     </td>
-                    
+
                     <td>{listing.category || "—"}</td>
                     <td>
                       <span
