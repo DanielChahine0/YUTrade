@@ -1,5 +1,4 @@
 services:
-  # ── Backend (FastAPI) ──────────────────────────────────────────────────────
   - type: web
     plan: free
     name: yutrade-api
@@ -26,6 +25,3 @@ services:
         sync: false
       - key: UPLOAD_DIR
         value: uploads
-
-  # Frontend is deployed separately on Vercel (free)
-  # See frontend/.env.example for required env vars
