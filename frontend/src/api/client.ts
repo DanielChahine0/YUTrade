@@ -18,28 +18,46 @@
 //    - Return Promise.reject(error) for other errors
 //
 // 5. Export the axios instance as default
-import axios from "axios"
-const apiclient = axios.create({
-    baseURL: process.env.REACT_APP_API_URL || "http://localhost:8000",
-})
-apiclient.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem("access_token")
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`
-        }
-        return config
-    },
-    (error) => Promise.reject(error)
-)
-apiclient.interceptors.response.use(
-    (response) => response,
-    (error) => {
-        if (error.response && error.response.status === 401) {
-            localStorage.removeItem("access_token")
-            window.location.href = "/login"
-        }
-        return Promise.reject(error)
+
+import axios, { InternalAxiosRequestConfig, AxiosHeaders } from "axios";
+
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+
+const client = axios.create({
+  baseURL: API_URL,
+  headers: new AxiosHeaders({ "Content-Type": "application/json" }),
+});
+
+// Request interceptor with proper headers type
+client.interceptors.request.use(
+  (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
+    const token = localStorage.getItem("access_token");
+
+    // Ensure headers exist and are AxiosHeaders
+    if (!config.headers) {
+      config.headers = new AxiosHeaders({ "Content-Type": "application/json" });
     }
-)
-export default apiclient
+
+    if (token) {
+      // Use .set() to correctly add Authorization header
+      (config.headers as AxiosHeaders).set("Authorization", `Bearer ${token}`);
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Response interceptor
+client.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem("access_token");
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default client;

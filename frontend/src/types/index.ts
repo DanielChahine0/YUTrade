@@ -158,3 +158,11 @@ export interface ResetPasswordRequest {
   code: string;
   new_password: string;
 }
+
+export interface ListingUpdate {
+  title?: string;
+  description?: string;
+  price?: number;
+  category?: string;
+  status?: "active" | "sold" | "removed";
+}
