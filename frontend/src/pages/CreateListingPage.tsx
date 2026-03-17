@@ -25,11 +25,15 @@
 //   - Price must be a positive number
 //   - Images should be image files (jpg, png, gif, webp)
 //   - Max file size: 5MB per image (client-side check)
+
+
+
 import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { createListing } from "../api/listings"
 import "../styles/global.css"
 import ImageUpload from "../components/ImageUpload"
+import { isValidPrice } from "../utils/validators"
 
 export default function CreateListingPage() {
   const navigate = useNavigate()
@@ -48,11 +52,12 @@ export default function CreateListingPage() {
       setError("Title is required")
       return
     }
-    const priceNum = parseFloat(price)
-    if (isNaN(priceNum) || priceNum < 0.01) {
-      setError("Price must be at least $0.01")
+
+    if (!isValidPrice(price)) {
+      setError("Price must be a valid number greater than $0.00")
       return
     }
+
     const formData = new FormData()
     formData.append("title", title)
     formData.append("description", description)
@@ -72,9 +77,8 @@ export default function CreateListingPage() {
 
   return (
     <div className="auth-page">
-      <div className="auth-card" style={{ width: 500 }}>
+      <div className="auth-card listing-card-form">
         <h1 className="auth-title">Create Listing</h1>
-
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="auth-field">
             <label className="auth-label">Title *</label>
@@ -92,6 +96,7 @@ export default function CreateListingPage() {
             <label className="auth-label">Description</label>
             <textarea
               className="auth-input listing-textarea"
+              placeholder="Tell students more about what you are selling..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
@@ -104,8 +109,8 @@ export default function CreateListingPage() {
               type="number"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              min={0.01}
-              step={0.01}
+              placeholder="0.00"
+              step="0.01"
               required
             />
           </div>
@@ -134,7 +139,7 @@ export default function CreateListingPage() {
           {error && <p className="auth-error">{error}</p>}
 
           <button className="btn-red" type="submit" disabled={loading}>
-            {loading ? "Creating…" : "Create Listing"}
+            {loading ? "Creating..." : "Create Listing"}
           </button>
 
           <button className="btn-outline" type="button" onClick={() => navigate(-1)}>
