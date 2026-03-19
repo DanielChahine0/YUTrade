@@ -24,8 +24,6 @@
 //   - PATCH /listings/{id} with JSON body
 //   - Return response.data
 
-
-// listings.ts
 import client from "./client";
 import { Listing, PaginatedListings } from "../types";
 
@@ -44,8 +42,11 @@ export const getListing = (id: number) => {
 };
 
 export const createListing = (formData: FormData) => {
-  // Do NOT set headers manually — let Axios handle multipart
-  return client.post<Listing>("/listings", formData).then((res) => res.data);
+  return client.post<Listing>("/listings", formData, {
+    headers: {
+      "Content-Type": undefined,
+    },
+  }).then((res) => res.data);
 };
 
 export const updateListing = (id: number, data: {
