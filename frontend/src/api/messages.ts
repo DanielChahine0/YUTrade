@@ -13,4 +13,14 @@
 // getMessages(listingId: number): Promise<{ messages: Message[] }>
 //   - GET /listings/{listingId}/messages
 //   - Return response.data
-export {}
+
+import client from "./client";
+import { Message, MessageCreateRequest } from "../types";
+
+export const sendMessage = (listingId: number, data: MessageCreateRequest) => {
+  return client.post<Message>(`/listings/${listingId}/messages`, data).then((res) => res.data);
+};
+
+export const getMessages = (listingId: number) => {
+  return client.get<{ messages: Message[] }>(`/listings/${listingId}/messages`).then((res) => res.data);
+};
