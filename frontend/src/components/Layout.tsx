@@ -24,6 +24,7 @@
 
 import React, { ReactNode } from "react"
 import { Navbar } from "./Navbar"
+import { Link } from "react-router-dom"
 
 interface LayoutProps {
     children: ReactNode
@@ -53,7 +54,11 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 backgroundColor: "#f2f2f2",
                 marginTop: "auto"
             }}>
-                <p>YU Trade &copy; 2026 — York University Campus Marketplace</p>
+                <p>
+                    YU Trade &copy; 2026 — York University Campus Marketplace
+                    <br />
+                    <Link to="/maps">Suggested Meeting Locations</Link>
+                </p>
             </footer>
         </div>
     )
