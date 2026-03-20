@@ -46,6 +46,7 @@ export const Navbar: React.FC = () => {
                         <Link to="/create" style={{ color: "white", textDecoration: "none" }}>Sell Item</Link>
                         <Link to="/my-listings" style={{ color: "white", textDecoration: "none" }}>My Listings</Link>
                         <Link to="/messages" style={{ color: "white", textDecoration: "none" }}>Messages</Link>
+                        <Link to="/maps" style={{ color: "white", textDecoration: "none" }}>Maps</Link>
                         <span style={{ borderLeft: "1px solid rgba(255,255,255,0.3)", paddingLeft: "1rem" }}>
                             Hello, {user?.name}
                         </span>
@@ -65,6 +66,7 @@ export const Navbar: React.FC = () => {
                     <>
                         <Link to="/login" style={{ color: "white", textDecoration: "none" }}>Login</Link>
                         <Link to="/register" style={{ color: "white", textDecoration: "none" }}>Register</Link>
+                        
                     </>
                 )}
             </div>
