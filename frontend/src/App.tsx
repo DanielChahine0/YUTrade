@@ -16,6 +16,7 @@ import BrowsePage from "./pages/BrowsePage"
 import ForgotPasswordPage from "./pages/ForgotPasswordPage"
 import ResetPasswordPage from "./pages/ResetPasswordPage"
 import EditListingPage from "./pages/EditListingPage"
+import MapsPage from './pages/MapsPage'
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/listings/:id" element={<ListingDetailPage />} />
         <Route path="/seller/:id" element={<SellerProfilePage />} />
+        <Route path="/maps" element={<MapsPage />} />
 
         <Route
           path="/create"
