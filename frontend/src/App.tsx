@@ -17,6 +17,7 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage"
 import ResetPasswordPage from "./pages/ResetPasswordPage"
 import EditListingPage from "./pages/EditListingPage"
 import MapsPage from './pages/MapsPage'
+import MessagesPage from "./pages/MessagesPage"
 
 function App() {
   return (
@@ -53,6 +54,15 @@ function App() {
           element={
             <ProtectedRoute>
               <MyListingsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/messages"
+          element={
+            <ProtectedRoute>
+              <MessagesPage />
             </ProtectedRoute>
           }
         />

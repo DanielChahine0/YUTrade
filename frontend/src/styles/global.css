@@ -36,7 +36,7 @@ a {
 
 /* Top navigation bar — stretches the entire viewport */
 .app-header {
-  background: #E31837;
+  background: var(--yu-red);
   color: #fff;
   display: flex;
   align-items: center;
@@ -833,3 +833,74 @@ a {
 }
 
 .image-preview button:hover { background: #B8132D; }
+
+
+/* ============================================================
+   MESSAGING COMPONENTS (Phase 3)
+   ============================================================ */
+
+.message-thread {
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background: var(--yu-white);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  height: 450px; /* Essential for the scrollbar to appear */
+}
+
+.messages-list {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 12px;
+  padding-right: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.message {
+  max-width: 80%;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  position: relative;
+  line-height: 1.4;
+}
+
+.message.sent {
+  align-self: flex-end;
+  background-color: var(--yu-red);
+  color: white;
+  border-bottom-right-radius: 2px;
+}
+
+.message.received {
+  align-self: flex-start;
+  background-color: var(--gray-100);
+  color: var(--text-main);
+  border-bottom-left-radius: 2px;
+}
+
+.message-sender {
+  font-size: 10px;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.message-time {
+  font-size: 10px;
+  opacity: 0.7;
+  display: block;
+  text-align: right;
+  margin-top: 4px;
+}
+
+.message-form {
+  display: flex;
+  gap: 8px;
+  border-top: 1px solid var(--gray-200);
+  padding-top: 12px;
+}

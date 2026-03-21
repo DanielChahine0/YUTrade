@@ -24,3 +24,9 @@ export const sendMessage = (listingId: number, data: MessageCreateRequest) => {
 export const getMessages = (listingId: number) => {
   return client.get<{ messages: Message[] }>(`/listings/${listingId}/messages`).then((res) => res.data);
 };
+
+
+//
+export const getAllThreads = () => {
+  return client.get<any[]>(`/messages`).then((res) => res.data);
+};

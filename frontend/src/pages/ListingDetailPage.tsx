@@ -1,11 +1,16 @@
 // Assigned to: Mai Komar
 // Phase: 2 (F2.4)
 
+
+
+// Assigned to: Mai Komar
+// Phase: 2 (F2.4)
+
 import React, { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { getListing } from "../api/listings"
 import { Listing } from "../types"
-import { formatPrice, formatDate } from "../utils/validators" // Added imports
+import { formatPrice, formatDate } from "../utils/validators" 
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000"
 
@@ -109,7 +114,6 @@ export default function ListingDetailPage() {
           
           <div className="detail-field-group">
             <div className="detail-label">Listed Price</div>
-            {/* Plugged in formatPrice helper */}
             <div className="detail-value" style={{ fontSize: 18, fontWeight: 800, color: '#E31837' }}>
               {formatPrice(listing.price)}
             </div>
@@ -140,16 +144,19 @@ export default function ListingDetailPage() {
             >
               View Seller Profile
             </button>
+            
             <button
               className="btn-red-sm"
               style={{ background: '#1a1a1a' }}
-              onClick={() => navigate("/messages")}
+              onClick={() => {
+                // Navigates to the separate messages page you created in App.tsx
+                navigate("/messages");
+              }}
             >
               Message Seller
             </button>
           </div>
         </div>
-        {/* Plugged in formatDate helper */}
         <div className="timestamp-text">Listed {formatDate(listing.created_at)}</div>
       </div>
     </div>

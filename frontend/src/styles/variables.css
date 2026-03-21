@@ -40,4 +40,81 @@
   
   /* Container Width */
   --container-width: 1200px;
+
+  /* Add to your :root variables */
+:root {
+  /* ... existing vars ... */
+  --msg-bg-sent: #E31837;
+  --msg-text-sent: #ffffff;
+  --msg-bg-received: #f1f0f0;
+  --msg-text-received: #222222;
+}
+
+/* ============================================================
+   MESSAGES PAGE (F3.4)
+   ============================================================ */
+
+.messages-list-container {
+  background: var(--yu-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.message-thread-row {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--gray-100);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.message-thread-row:hover {
+  background: var(--gray-50);
+}
+
+.message-thread-row.unread {
+  background: #fff8f8;
+  border-left: 4px solid var(--yu-red);
+}
+
+.thread-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  margin-right: 16px;
+  background: var(--gray-100);
+}
+
+.thread-info {
+  flex: 1;
+  min-width: 0; /* Enables text-overflow: ellipsis */
+}
+
+.thread-top-line {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.thread-title {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--yu-black);
+}
+
+.thread-date {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.thread-preview-text {
+  font-size: 13px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 }
