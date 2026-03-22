@@ -6,6 +6,7 @@ import { useParams, useNavigate } from "react-router-dom"
 import { getListings } from "../api/listings"
 import { Listing } from "../types"
 import { formatPrice, formatDate } from "../utils/validators" // Consistent Plugs
+import { useAuth } from "../hooks/useAuth"
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000"
 
@@ -35,6 +36,7 @@ export default function SellerProfilePage() {
   const [loading, setLoading] = useState(true)
   const [sellerName, setSellerName] = useState("")
   const [memberSince, setMemberSince] = useState("")
+  const { user } = useAuth()
 
   useEffect(() => {
     if (!id) return
@@ -75,13 +77,13 @@ export default function SellerProfilePage() {
             Active since: {memberSince ? formatDate(memberSince) : "—"}
           </div>
 
-          <button
-            className="btn-red"
-            style={{ width: "auto", marginTop: 12 }}
-            onClick={() => navigate("/messages")}
-          >
-            Message Seller
-          </button>
+         <button
+          className="btn-red"
+          style={{ width: "auto", marginTop: 12 }}
+          onClick={() => navigate("/messages")}
+        >
+          {user?.id === parseInt(id!) ? "View Messages" : "Message Seller"}
+        </button>
         </div>
       </div>
 
