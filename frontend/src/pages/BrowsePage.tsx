@@ -22,9 +22,8 @@ export default function BrowsePage() {
   const [category, setCategory] = useState("")
   const [minPrice, setMinPrice] = useState("")
   const [maxPrice, setMaxPrice] = useState("")
-  const [sort, setSort] = useState("newest")
-  const [dateListed, setDateListed] = useState("")
-
+  const [sort, setSort] = useState<"newest" | "price_low_to_high" | "price_high_to_low">("newest")  
+  const [dateListed, setDateListed] = useState<"" | "last_24_hours" | "last_7_days" | "last_30_days">("")
   const limit = 20
   const totalPages = Math.ceil(total / limit)
 
@@ -126,10 +125,10 @@ const handleClearFilters = () => {
           className="auth-input listing-select"
           style={{ width: 190, marginBottom: 0 }}
           value={sort}
-          onChange={(e) => {
-            setPage(1)
-            setSort(e.target.value)
-          }}
+        onChange={(e) => {
+          setPage(1)
+          setSort(e.target.value as "newest" | "price_low_to_high" | "price_high_to_low")
+        }}
         >
           <option value="newest">Newest</option>
           <option value="price_low_to_high">Price: Low to High</option>
@@ -140,10 +139,10 @@ const handleClearFilters = () => {
           className="auth-input listing-select"
           style={{ width: 180, marginBottom: 0 }}
           value={dateListed}
-          onChange={(e) => {
-            setPage(1)
-            setDateListed(e.target.value)
-          }}
+        onChange={(e) => {
+          setPage(1)
+          setDateListed(e.target.value as "" | "last_24_hours" | "last_7_days" | "last_30_days")
+        }}
         >
           <option value="">Any time</option>
           <option value="last_24_hours">Last 24 hours</option>
