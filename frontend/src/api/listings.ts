@@ -27,13 +27,17 @@
 import client from "./client";
 import { Listing, PaginatedListings } from "../types";
 
-export const getListings = (params?: {
+export type GetListingsParams = {
   search?: string;
   category?: string;
   status?: string;
+  min_price?: number;
+  max_price?: number;
   page?: number;
   limit?: number;
-}) => {
+};
+
+export const getListings = (params?: GetListingsParams) => {
   return client.get<PaginatedListings>("/listings", { params }).then((res) => res.data);
 };
 
