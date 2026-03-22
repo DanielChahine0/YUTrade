@@ -150,14 +150,14 @@ const handleClearFilters = () => {
           <option value="last_30_days">Last 30 days</option>
         </select>        
 
-        <button className="btn-red" type="submit" style={{ width: "auto", padding: "0 24px" }}>
+        <button className="btn-red" type="submit" style={{ width: "auto", padding: "10px 24px" }}>
           Apply Filters
         </button>
 
         <button
           className="btn-outline"
           type="button"
-          style={{ width: "auto", padding: "0 24px" }}
+          style={{ width: "auto", padding: "10px 24px" }}
           onClick={handleClearFilters}
         >
           Clear

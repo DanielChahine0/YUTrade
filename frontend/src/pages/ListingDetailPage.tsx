@@ -1,45 +1,24 @@
 // Assigned to: Mai Komar
 // Phase: 2 (F2.4)
 
-
-
-// Assigned to: Mai Komar
-// Phase: 2 (F2.4)
-
 import React, { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { getListing } from "../api/listings"
+import { useAuth } from "../hooks/useAuth"
 import { Listing } from "../types"
-import { formatPrice, formatDate } from "../utils/validators" 
+import { formatPrice, formatDate } from "../utils/validators"
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000"
-
-function StarRating({ rating, max = 5 }: { rating: number; max?: number }) {
-  return (
-    <div className="star-row">
-      {Array.from({ length: max }).map((_, i) => {
-        const filled = i < Math.floor(rating)
-        const half = !filled && i < rating
-        return (
-          <span
-            key={i}
-            className={filled ? "star-icon" : half ? "star-icon-half" : "star-icon-empty"}
-          >
-            ★
-          </span>
-        )
-      })}
-    </div>
-  )
-}
 
 export default function ListingDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [listing, setListing] = useState<Listing | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [imgIdx, setImgIdx] = useState(0)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -48,6 +27,17 @@ export default function ListingDetailPage() {
       .catch(() => setError("Listing not found"))
       .finally(() => setLoading(false))
   }, [id])
+
+  useEffect(() => {
+    if (!lightboxOpen) return
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightboxOpen(false)
+      if (e.key === "ArrowRight") setImgIdx(i => i + 1)
+      if (e.key === "ArrowLeft") setImgIdx(i => Math.max(i - 1, 0))
+    }
+    window.addEventListener("keydown", handleKey)
+    return () => window.removeEventListener("keydown", handleKey)
+  }, [lightboxOpen])
 
   if (loading) {
     return (
@@ -61,7 +51,11 @@ export default function ListingDetailPage() {
     return (
       <div className="app-content" style={{ textAlign: "center", paddingTop: 48 }}>
         <p style={{ color: "#888" }}>{error || "Listing not found"}</p>
-        <button className="btn-outline" style={{ width: 'auto', marginTop: 16 }} onClick={() => navigate("/browse")}>
+        <button
+          className="btn-outline"
+          style={{ width: "auto", marginTop: 16 }}
+          onClick={() => navigate("/browse")}
+        >
           Back to Browse
         </button>
       </div>
@@ -70,95 +64,135 @@ export default function ListingDetailPage() {
 
   const images = [...listing.images].sort((a, b) => a.position - b.position)
   const currentImg = images[imgIdx]
+  const isSeller = user?.id === listing.seller_id
 
   return (
     <div className="app-content">
-      {/* Two-column: carousel + details */}
-      <div className="listing-detail-cols">
-        {/* Left: Image Carousel */}
-        <div className="carousel-wrap">
-          <div className="carousel-img">
+      <button className="detail-back-btn" onClick={() => navigate(-1)}>
+        ← Back
+      </button>
+
+      <div className="detail-layout">
+
+        {/* Left: Image + Thumbnails */}
+        <div className="detail-left">
+          <div
+            className="detail-main-img"
+            style={{ cursor: currentImg ? "zoom-in" : "default" }}
+            onClick={() => currentImg && setLightboxOpen(true)}
+          >
             {currentImg ? (
-              <img
-                src={`${API_URL}/${currentImg.file_path}`}
-                alt={listing.title}
-              />
+              <img src={`${API_URL}/${currentImg.file_path}`} alt={listing.title} />
             ) : (
-              <span className="carousel-img-placeholder">No Image</span>
+              <span className="detail-no-img">No Image</span>
             )}
           </div>
+
           {images.length > 1 && (
-            <div className="carousel-dots">
-              {images.map((_, i) => (
-                <button
+            <div className="detail-thumbnails">
+              {images.map((img, i) => (
+                <div
                   key={i}
-                  className={`carousel-dot${i === imgIdx ? " active" : ""}`}
+                  className={`detail-thumbnail${i === imgIdx ? " active" : ""}`}
                   onClick={() => setImgIdx(i)}
-                />
+                >
+                  <img src={`${API_URL}/${img.file_path}`} alt={`${listing.title} ${i + 1}`} />
+                </div>
               ))}
             </div>
           )}
         </div>
 
-        {/* Right: Title, Description, Fields */}
-        <div>
-          <h1 className="detail-title">{listing.title}</h1>
-          
-          <div className="detail-label">Description</div>
-          <textarea
-            className="detail-desc"
-            readOnly
-            value={listing.description || ""}
-            placeholder="No description provided by seller."
-          />
-          
-          <div className="detail-field-group">
-            <div className="detail-label">Listed Price</div>
-            <div className="detail-value" style={{ fontSize: 18, fontWeight: 800, color: '#E31837' }}>
-              {formatPrice(listing.price)}
-            </div>
-          </div>
-          
-          <div className="detail-field-group">
-            <div className="detail-label">Category</div>
-            <div className="detail-value">{listing.category || "General"}</div>
-          </div>
-        </div>
-      </div>
+        {/* Right: Details + Seller */}
+        <div className="detail-right">
 
-      {/* Posted By Section */}
-      <div className="posted-by-section">
-        <div className="posted-by-grid">
-          <div>
-            <div className="detail-label" style={{ marginBottom: 4 }}>Posted By</div>
-            <div className="detail-value" style={{ marginBottom: 8, fontWeight: 600 }}>
-              {listing.seller.name}
+          {/* Details card */}
+          <div className="detail-info-card">
+            <h1 className="detail-info-title">{listing.title}</h1>
+            <div className="detail-info-price">{formatPrice(listing.price)}</div>
+
+            <div className="detail-info-label">Description</div>
+            <p className="detail-info-desc">{listing.description || "No description provided."}</p>
+
+            <div className="detail-info-row">
+              <span className="detail-info-label" style={{ marginBottom: 0 }}>Category</span>
+              <span className="detail-info-value">{listing.category || "General"}</span>
             </div>
-            <div className="detail-label" style={{ marginBottom: 4 }}>Seller Rating</div>
-            <StarRating rating={4.0} />
+
+            <div className="detail-info-timestamp">Listed {formatDate(listing.created_at)}</div>
           </div>
-          <div style={{ paddingTop: 20 }}>
+
+          {/* Seller card */}
+          <div className="detail-seller-card">
+            <div className="detail-seller-info">
+              <div className="detail-seller-avatar">
+                {listing.seller.name.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <div className="detail-seller-name">{listing.seller.name}</div>
+              </div>
+            </div>
+
             <button
               className="btn-red-sm"
               onClick={() => navigate(`/seller/${listing.seller_id}`)}
             >
               View Seller Profile
             </button>
-            
-            <button
-              className="btn-red-sm"
-              style={{ background: '#1a1a1a' }}
-              onClick={() => {
-                // Navigates to the separate messages page you created in App.tsx
-                navigate("/messages");
-              }}
-            >
-              Message Seller
-            </button>
+
+            {!isSeller && (
+              <button
+                className="btn-red-sm"
+                style={{ background: "#1a1a1a" }}
+                onClick={() => navigate("/messages")}
+              >
+                Message Seller
+              </button>
+            )}
           </div>
+
         </div>
-        <div className="timestamp-text">Listed {formatDate(listing.created_at)}</div>
       </div>
+
+      {/* Lightbox */}
+      {lightboxOpen && currentImg && (
+        <div className="lightbox-overlay" onClick={() => setLightboxOpen(false)}>
+          <button className="lightbox-close" onClick={() => setLightboxOpen(false)}>
+            ×
+          </button>
+ 
+          {imgIdx > 0 && (
+            <button
+              className="lightbox-arrow lightbox-arrow-left"
+              onClick={(e) => { e.stopPropagation(); setImgIdx(i => i - 1) }}
+            >
+              ‹
+            </button>
+          )}
+ 
+          <img
+            className="lightbox-img"
+            src={`${API_URL}/${currentImg.file_path}`}
+            alt={listing.title}
+            onClick={(e) => e.stopPropagation()}
+          />
+ 
+          {imgIdx < images.length - 1 && (
+            <button
+              className="lightbox-arrow lightbox-arrow-right"
+              onClick={(e) => { e.stopPropagation(); setImgIdx(i => i + 1) }}
+            >
+              ›
+            </button>
+          )}
+ 
+          {images.length > 1 && (
+            <div className="lightbox-counter">
+              {imgIdx + 1} / {images.length}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
