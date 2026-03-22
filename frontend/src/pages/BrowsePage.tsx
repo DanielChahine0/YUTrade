@@ -22,6 +22,8 @@ export default function BrowsePage() {
   const [category, setCategory] = useState("")
   const [minPrice, setMinPrice] = useState("")
   const [maxPrice, setMaxPrice] = useState("")
+  const [sort, setSort] = useState("newest")
+  const [dateListed, setDateListed] = useState("")
 
   const limit = 20
   const totalPages = Math.ceil(total / limit)
@@ -37,6 +39,8 @@ export default function BrowsePage() {
     category: category || undefined,
     min_price: minPrice ? Number(minPrice) : undefined,
     max_price: maxPrice ? Number(maxPrice) : undefined,
+    sort,
+    date_listed: dateListed || undefined,
   })
       .then((data) => {
         setListings(data.listings || [])
@@ -44,7 +48,7 @@ export default function BrowsePage() {
       })
       .catch(() => setError("Failed to load listings. Please try again later."))
       .finally(() => setLoading(false))
-  }, [page, search, category, minPrice, maxPrice])
+}, [page, search, category, minPrice, maxPrice, sort, dateListed])
 
 const handleFilterSubmit = (e: React.FormEvent) => {
   e.preventDefault()
@@ -59,7 +63,7 @@ const handleFilterSubmit = (e: React.FormEvent) => {
   setSearch(searchInput.trim())
 }
 
-  const handleClearFilters = () => {
+const handleClearFilters = () => {
   setError("")
   setPage(1)
   setSearch("")
@@ -67,8 +71,9 @@ const handleFilterSubmit = (e: React.FormEvent) => {
   setCategory("")
   setMinPrice("")
   setMaxPrice("")
-  }
-
+  setSort("newest")
+  setDateListed("")
+}
   const handleCategoryChange = (cat: string) => {
     setPage(1)
     setCategory(cat === "All" ? "" : cat)
@@ -117,6 +122,34 @@ const handleFilterSubmit = (e: React.FormEvent) => {
           value={maxPrice}
           onChange={(e) => setMaxPrice(e.target.value)}
         />
+        <select
+          className="auth-input listing-select"
+          style={{ width: 190, marginBottom: 0 }}
+          value={sort}
+          onChange={(e) => {
+            setPage(1)
+            setSort(e.target.value)
+          }}
+        >
+          <option value="newest">Newest</option>
+          <option value="price_low_to_high">Price: Low to High</option>
+          <option value="price_high_to_low">Price: High to Low</option>
+        </select>
+
+        <select
+          className="auth-input listing-select"
+          style={{ width: 180, marginBottom: 0 }}
+          value={dateListed}
+          onChange={(e) => {
+            setPage(1)
+            setDateListed(e.target.value)
+          }}
+        >
+          <option value="">Any time</option>
+          <option value="last_24_hours">Last 24 hours</option>
+          <option value="last_7_days">Last 7 days</option>
+          <option value="last_30_days">Last 30 days</option>
+        </select>        
 
         <button className="btn-red" type="submit" style={{ width: "auto", padding: "0 24px" }}>
           Apply Filters
