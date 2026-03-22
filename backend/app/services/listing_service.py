@@ -10,17 +10,20 @@
 #       - Save file to uploads/ directory
 #       - Create Image record with file_path and position (index)
 #   - Commit and return the listing with relationships loaded
-#
-# get_listings(db, search, category, status, page, limit) -> (List[Listing], total):
+
+# get_listings(db, search, category, status, min_price, max_price, sort, date_listed, page, limit) -> (List[Listing], total):#   - Start with query on Listing
 #   - Start with query on Listing
 #   - Filter by status (default "active")
 #   - If search: filter where title ILIKE %search% OR description ILIKE %search%
 #   - If category: filter where category == category
-#   - Phase 3 (B3.5): Add min_price/max_price filtering
+#   - If min_price: filter where price >= min_price
+#   - If max_price: filter where price <= max_price
+#   - If date_listed: filter by created_at cutoff (last_24_hours, last_7_days, last_30_days)
+#   - Apply sort order: newest, price_low_to_high, or price_high_to_low
 #   - Count total matching records
 #   - Apply offset = (page - 1) * limit and limit
 #   - Return (listings, total_count)
-#
+
 # get_listing_by_id(db, listing_id) -> Listing | None:
 #   - Query listing by ID with joinedload on images and seller
 #   - Return listing or None
@@ -32,7 +35,7 @@
 #   - Commit and return updated listing
 
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 from uuid import uuid4
 
@@ -106,6 +109,10 @@ def get_listings(
     search: Optional[str],
     category: Optional[str],
     status: str,
+    min_price: Optional[float],
+    max_price: Optional[float],
+    sort: str,
+    date_listed: Optional[str],
     page: int,
     limit: int,
 ):
@@ -126,6 +133,29 @@ def get_listings(
 
     if category:
         query = query.filter(Listing.category == category)
+
+    if min_price is not None:
+        query = query.filter(Listing.price >= min_price)
+
+    if max_price is not None:
+        query = query.filter(Listing.price <= max_price)
+
+    if date_listed == "last_24_hours":
+        cutoff = datetime.utcnow() - timedelta(hours=24)
+        query = query.filter(Listing.created_at >= cutoff)
+    elif date_listed == "last_7_days":
+        cutoff = datetime.utcnow() - timedelta(days=7)
+        query = query.filter(Listing.created_at >= cutoff)
+    elif date_listed == "last_30_days":
+        cutoff = datetime.utcnow() - timedelta(days=30)
+        query = query.filter(Listing.created_at >= cutoff)
+
+    if sort == "price_low_to_high":
+        query = query.order_by(Listing.price.asc())
+    elif sort == "price_high_to_low":
+        query = query.order_by(Listing.price.desc())
+    else:
+        query = query.order_by(Listing.created_at.desc())
 
     total = query.count()
 
