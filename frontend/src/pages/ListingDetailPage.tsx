@@ -10,22 +10,6 @@ import { formatPrice, formatDate } from "../utils/validators"
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000"
 
-function StarRating({ rating, max = 5 }: { rating: number; max?: number }) {
-  return (
-    <div className="star-row">
-      {Array.from({ length: max }).map((_, i) => {
-        const filled = i < Math.floor(rating)
-        const half = !filled && i < rating
-        return (
-          <span key={i} className={filled ? "star-icon" : half ? "star-icon-half" : "star-icon-empty"}>
-            ★
-          </span>
-        )
-      })}
-    </div>
-  )
-}
-
 export default function ListingDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
@@ -34,6 +18,7 @@ export default function ListingDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [imgIdx, setImgIdx] = useState(0)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -42,6 +27,17 @@ export default function ListingDetailPage() {
       .catch(() => setError("Listing not found"))
       .finally(() => setLoading(false))
   }, [id])
+
+  useEffect(() => {
+    if (!lightboxOpen) return
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightboxOpen(false)
+      if (e.key === "ArrowRight") setImgIdx(i => i + 1)
+      if (e.key === "ArrowLeft") setImgIdx(i => Math.max(i - 1, 0))
+    }
+    window.addEventListener("keydown", handleKey)
+    return () => window.removeEventListener("keydown", handleKey)
+  }, [lightboxOpen])
 
   if (loading) {
     return (
@@ -55,7 +51,11 @@ export default function ListingDetailPage() {
     return (
       <div className="app-content" style={{ textAlign: "center", paddingTop: 48 }}>
         <p style={{ color: "#888" }}>{error || "Listing not found"}</p>
-        <button className="btn-outline" style={{ width: "auto", marginTop: 16 }} onClick={() => navigate("/browse")}>
+        <button
+          className="btn-outline"
+          style={{ width: "auto", marginTop: 16 }}
+          onClick={() => navigate("/browse")}
+        >
           Back to Browse
         </button>
       </div>
@@ -68,20 +68,26 @@ export default function ListingDetailPage() {
 
   return (
     <div className="app-content">
-
-      <button className="detail-back-btn" onClick={() => navigate(-1)}>← Back</button>
+      <button className="detail-back-btn" onClick={() => navigate(-1)}>
+        ← Back
+      </button>
 
       <div className="detail-layout">
 
         {/* Left: Image + Thumbnails */}
         <div className="detail-left">
-          <div className="detail-main-img">
+          <div
+            className="detail-main-img"
+            style={{ cursor: currentImg ? "zoom-in" : "default" }}
+            onClick={() => currentImg && setLightboxOpen(true)}
+          >
             {currentImg ? (
               <img src={`${API_URL}/${currentImg.file_path}`} alt={listing.title} />
             ) : (
               <span className="detail-no-img">No Image</span>
             )}
           </div>
+
           {images.length > 1 && (
             <div className="detail-thumbnails">
               {images.map((img, i) => (
@@ -124,18 +130,16 @@ export default function ListingDetailPage() {
               </div>
               <div>
                 <div className="detail-seller-name">{listing.seller.name}</div>
-                <div className="detail-seller-rating">
-                  <StarRating rating={4.0} />
-                  <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>4.0 Rating</span>
-                </div>
               </div>
             </div>
+
             <button
               className="btn-red-sm"
               onClick={() => navigate(`/seller/${listing.seller_id}`)}
             >
               View Seller Profile
             </button>
+
             {!isSeller && (
               <button
                 className="btn-red-sm"
@@ -149,6 +153,46 @@ export default function ListingDetailPage() {
 
         </div>
       </div>
+
+      {/* Lightbox */}
+      {lightboxOpen && currentImg && (
+        <div className="lightbox-overlay" onClick={() => setLightboxOpen(false)}>
+          <button className="lightbox-close" onClick={() => setLightboxOpen(false)}>
+            ×
+          </button>
+ 
+          {imgIdx > 0 && (
+            <button
+              className="lightbox-arrow lightbox-arrow-left"
+              onClick={(e) => { e.stopPropagation(); setImgIdx(i => i - 1) }}
+            >
+              ‹
+            </button>
+          )}
+ 
+          <img
+            className="lightbox-img"
+            src={`${API_URL}/${currentImg.file_path}`}
+            alt={listing.title}
+            onClick={(e) => e.stopPropagation()}
+          />
+ 
+          {imgIdx < images.length - 1 && (
+            <button
+              className="lightbox-arrow lightbox-arrow-right"
+              onClick={(e) => { e.stopPropagation(); setImgIdx(i => i + 1) }}
+            >
+              ›
+            </button>
+          )}
+ 
+          {images.length > 1 && (
+            <div className="lightbox-counter">
+              {imgIdx + 1} / {images.length}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

@@ -427,6 +427,11 @@ a {
   font-size: 12px;
   color: #aaa;
 }
+.listing-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
 
 /* ============================================================
    LISTING DETAIL PAGE
@@ -905,7 +910,7 @@ a {
   padding-top: 12px;
 }
 /* ============================================================
-   LISTING DETAIL — NEW LAYOUT
+   LISTING DETAIL PAGE
    ============================================================ */
 
 .detail-back-btn {
@@ -1098,4 +1103,74 @@ a {
 .detail-main-img {
   aspect-ratio: 4 / 3;
   max-height: 360px;
+}
+
+.page-center {
+  text-align: center;
+  padding-top: 48px;
+}
+ 
+.page-center-muted {
+  color: #aaa;
+}
+ 
+
+.detail-main-img.clickable {
+  cursor: zoom-in;
+}
+ 
+
+.btn-red-sm.btn-dark {
+  background: #1a1a1a;
+}
+
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.92);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+ 
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 32px;
+  cursor: pointer;
+  line-height: 1;
+}
+ 
+.lightbox-arrow {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: #fff;
+  font-size: 28px;
+  border-radius: 6px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+ 
+.lightbox-arrow-left  { left: 20px; }
+.lightbox-arrow-right { right: 20px; }
+ 
+.lightbox-img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+}
+ 
+.lightbox-counter {
+  position: absolute;
+  bottom: 20px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
 }
