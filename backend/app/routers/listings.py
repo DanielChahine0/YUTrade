@@ -70,10 +70,14 @@ def get_listings(
     search: Optional[str] = Query(None, description="Search keyword matched against title and description", examples=["calculus textbook"]),
     category: Optional[str] = Query(None, description="Filter by category (Textbooks, Electronics, Furniture, Clothing, Other)", examples=["Textbooks"]),
     status: str = Query("active", description="Filter by listing status. Use 'active' for available items", examples=["active"]),
+    min_price: Optional[float] = Query(None, ge=0, description="Minimum listing price", examples=[10]),
+    max_price: Optional[float] = Query(None, ge=0, description="Maximum listing price", examples=[100]),
+    sort: str = Query("newest", description="Sort order: newest, price_low_to_high, price_high_to_low", examples=["newest"]),
+    date_listed: Optional[str] = Query(None, description="Filter by how recently a listing was posted: last_24_hours, last_7_days, last_30_days", examples=["last_7_days"]),
     page: int = Query(1, description="Page number (1-indexed)", ge=1, examples=[1]),
     limit: int = Query(20, description="Number of results per page (max 100)", ge=1, le=100, examples=[20]),
     db: Session = Depends(get_db),
-):
+):    
     """
     Browse all listings with optional search, filtering, and pagination.
 
@@ -85,11 +89,26 @@ def get_listings(
 
     No authentication required.
     """
+    if min_price is not None and max_price is not None and min_price > max_price:
+        raise HTTPException(status_code=400, detail="min_price cannot be greater than max_price")
+
+    valid_sorts = {"newest", "price_low_to_high", "price_high_to_low"}
+    if sort not in valid_sorts:
+        raise HTTPException(status_code=400, detail="Invalid sort value")
+
+    valid_date_listed = {"last_24_hours", "last_7_days", "last_30_days"}
+    if date_listed is not None and date_listed not in valid_date_listed:
+        raise HTTPException(status_code=400, detail="Invalid date_listed value")    
+    
     listings, total = listing_service.get_listings(
         db=db,
         search=search,
         category=category,
         status=status,
+        min_price=min_price,
+        max_price=max_price,
+        sort=sort,
+        date_listed=date_listed,
         page=page,
         limit=limit,
     )
