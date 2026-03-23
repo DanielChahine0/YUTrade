@@ -166,3 +166,47 @@ export interface ListingUpdate {
   category?: string;
   status?: "active" | "sold" | "removed";
 }
+
+export interface RaterOut {
+  id: number;
+  name: string;
+}
+
+export interface Rating {
+  id: number;
+  listing_id: number;
+  seller_id: number;
+  rater_id: number;
+  rater: RaterOut;
+  score: number;
+  comment: string | null;
+  created_at: string;
+}
+
+export interface SellerOut {
+  id: number;
+  name: string;
+  created_at: string;
+}
+
+export interface SellerRatingsOut {
+  ratings: Rating[];
+  average_score: number | null;
+  total_count: number;
+  seller?: SellerOut;
+}
+
+export interface MyRatingOut {
+  rating: Rating | null;
+  can_rate: boolean;
+}
+
+export interface RatingCreate {
+  score: number;
+  comment?: string;
+}
+
+export interface RatingUpdate {
+  score?: number;
+  comment?: string;
+}

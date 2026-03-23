@@ -4,39 +4,28 @@
 import React, { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { getListings } from "../api/listings"
-import { Listing } from "../types"
+import { getSellerRatings } from "../api/ratings"
+import { Listing, SellerRatingsOut } from "../types"
 import { formatPrice, formatDate } from "../utils/validators" // Consistent Plugs
 import { useAuth } from "../hooks/useAuth"
+import StarRating from "../components/StarRating"
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000"
-
-function StarRating({ rating, max = 5 }: { rating: number; max?: number }) {
-  return (
-    <div className="star-row">
-      {Array.from({ length: max }).map((_, i) => {
-        const filled = i < Math.floor(rating)
-        const half = !filled && i < rating
-        return (
-          <span
-            key={i}
-            className={filled ? "star-icon" : half ? "star-icon-half" : "star-icon-empty"}
-          >
-            ★
-          </span>
-        )
-      })}
-    </div>
-  )
-}
 
 export default function SellerProfilePage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [listings, setListings] = useState<Listing[]>([])
   const [loading, setLoading] = useState(true)
-  const [sellerName, setSellerName] = useState("")
-  const [memberSince, setMemberSince] = useState("")
   const { user } = useAuth()
+  const [sellerRatings, setSellerRatings] = useState<SellerRatingsOut | null>(null)
+
+  useEffect(() => {
+    if (!id) return
+    getSellerRatings(parseInt(id))
+      .then(setSellerRatings)
+      .catch(() => setSellerRatings({ ratings: [], average_score: null, total_count: 0 }))
+  }, [id])
 
   useEffect(() => {
     if (!id) return
@@ -70,7 +59,19 @@ export default function SellerProfilePage() {
 
           <div className="seller-rating-row" style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '8px 0' }}>
             <span className="detail-label" style={{ marginBottom: 0 }}>Rating</span>
-            <StarRating rating={4} />
+            <div className="rating-summary">
+              {sellerRatings && sellerRatings.total_count > 0 ? (
+                <>
+                  <span className="rating-summary-score">{sellerRatings.average_score?.toFixed(1)}</span>
+                  <StarRating rating={sellerRatings.average_score ?? 0} />
+                  <span className="rating-summary-count">
+                    ({sellerRatings.total_count} review{sellerRatings.total_count !== 1 ? "s" : ""})
+                  </span>
+                </>
+              ) : (
+                <span style={{ color: "#aaa", fontSize: 13 }}>No reviews yet</span>
+              )}
+            </div>
           </div>
 
           <div className="detail-label">
@@ -168,6 +169,28 @@ export default function SellerProfilePage() {
           </table>
         </div>
       )}
+
+      {/* Reviews */}
+      <div className="reviews-section">
+        <div className="reviews-section-title">Reviews</div>
+        {!sellerRatings || sellerRatings.total_count === 0 ? (
+          <p style={{ color: "#aaa", fontSize: 13 }}>No reviews yet</p>
+        ) : (
+          sellerRatings.ratings.map(r => (
+            <div key={r.id} className="review-card">
+              <div className="review-card-header">
+                <span className="review-card-rater">{r.rater.name}</span>
+                <span className="review-card-date">{formatDate(r.created_at)}</span>
+              </div>
+              <StarRating rating={r.score} />
+              {r.comment
+                ? <p className="review-card-comment">{r.comment}</p>
+                : <p style={{ fontSize: 13, color: "#bbb", fontStyle: "italic" }}>No comment</p>
+              }
+            </div>
+          ))
+        )}
+      </div>
     </div>
   )
 }

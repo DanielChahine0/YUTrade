@@ -9,3 +9,4 @@ from .password_reset import PasswordResetCode
 from .listing import Listing
 from .image import Image
 from .message import Message
+from .rating import Rating

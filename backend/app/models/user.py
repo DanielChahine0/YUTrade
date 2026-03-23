@@ -37,3 +37,5 @@ class User(Base):
     listings = relationship("Listing", back_populates="seller")
     sent_messages = relationship("Message", foreign_keys="Message.sender_id", back_populates="sender", overlaps="sender")
     received_messages = relationship("Message", foreign_keys="Message.receiver_id", back_populates="receiver", overlaps="receiver")
+    ratings_received = relationship("Rating", foreign_keys="Rating.seller_id", back_populates="seller", overlaps="seller")
+    ratings_given    = relationship("Rating", foreign_keys="Rating.rater_id",  back_populates="rater",  overlaps="rater")

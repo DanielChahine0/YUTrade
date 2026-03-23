@@ -27,10 +27,11 @@ from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
 from app.database import Base, engine
-from app.models import User, VerificationCode, PasswordResetCode, Listing, Image, Message  # noqa: F401 — register models
+from app.models import User, VerificationCode, PasswordResetCode, Listing, Image, Message, Rating  # noqa: F401 — register models
 from app.routers.auth import router as auth_router
 from app.routers.listings import router as listing_router
 from app.routers.threads import router as threads_router
+from app.routers.ratings import router as ratings_router
 
 
 @asynccontextmanager
@@ -61,6 +62,7 @@ app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads"
 app.include_router(auth_router, prefix="/auth", tags=["Auth"])
 app.include_router(listing_router, prefix="/listings", tags=["Listings"])
 app.include_router(threads_router, prefix="/messages", tags=["Messages"])
+app.include_router(ratings_router, tags=["Ratings"])
 
 @app.get("/")
 def root():

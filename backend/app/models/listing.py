@@ -44,3 +44,4 @@ class Listing(Base):
     seller = relationship("User", back_populates="listings")
     images = relationship("Image", back_populates="listing", cascade="all, delete-orphan")
     messages = relationship("Message", back_populates="listing")
+    ratings = relationship("Rating", back_populates="listing", cascade="all, delete-orphan")

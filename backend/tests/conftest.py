@@ -42,7 +42,7 @@ from fastapi.testclient import TestClient
 from app.database import Base
 from app.dependencies import get_db
 from app.main import app
-from app.models import User, VerificationCode, Listing, Image, Message  # noqa: F401 — register all models
+from app.models import User, VerificationCode, Listing, Image, Message, Rating  # noqa: F401 — register all models
 
 
 # Create a single test engine shared across the test session
