@@ -4,6 +4,15 @@
 import React, { useState, useEffect } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { getListing, updateListing } from "../api/listings"
+import ImageUpload from "../components/ImageUpload"
+
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000"
+
+interface ExistingImage {
+  id: number
+  file_path: string
+  position: number
+}
 
 export default function EditListingPage() {
   const { id } = useParams<{ id: string }>()
@@ -14,6 +23,9 @@ export default function EditListingPage() {
   const [price, setPrice] = useState("")
   const [category, setCategory] = useState("")
   const [status, setStatus] = useState("active")
+  const [existingImages, setExistingImages] = useState<ExistingImage[]>([])
+  const [deleteImageIds, setDeleteImageIds] = useState<number[]>([])
+  const [newImages, setNewImages] = useState<File[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState("")
@@ -27,10 +39,17 @@ export default function EditListingPage() {
         setPrice(listing.price.toString())
         setCategory(listing.category || "")
         setStatus(listing.status)
+        setExistingImages(listing.images || [])
       })
       .catch(() => setError("Failed to load listing."))
       .finally(() => setLoading(false))
   }, [id])
+
+  const toggleDeleteImage = (imageId: number) => {
+    setDeleteImageIds((prev) =>
+      prev.includes(imageId) ? prev.filter((i) => i !== imageId) : [...prev, imageId]
+    )
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -52,6 +71,8 @@ export default function EditListingPage() {
         price: priceNum,
         category: category || undefined,
         status,
+        newImages: newImages.length > 0 ? newImages : undefined,
+        deleteImageIds: deleteImageIds.length > 0 ? deleteImageIds : undefined,
       })
       navigate(`/listings/${id}`)
     } catch (err: any) {
@@ -136,6 +157,46 @@ export default function EditListingPage() {
               <option value="sold">Sold</option>
               <option value="removed">Removed</option>
             </select>
+          </div>
+
+          {existingImages.length > 0 && (
+            <div className="auth-field">
+              <label className="auth-label">Current Photos</label>
+              <div className="image-previews">
+                {existingImages.map((img) => {
+                  const markedForDeletion = deleteImageIds.includes(img.id)
+                  return (
+                    <div
+                      key={img.id}
+                      className="image-preview"
+                      style={{ opacity: markedForDeletion ? 0.35 : 1 }}
+                    >
+                      <img
+                        src={`${API_URL}/${img.file_path}`}
+                        alt={`Photo ${img.position + 1}`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => toggleDeleteImage(img.id)}
+                        title={markedForDeletion ? "Undo remove" : "Remove photo"}
+                      >
+                        {markedForDeletion ? "↩" : "×"}
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
+              {deleteImageIds.length > 0 && (
+                <p style={{ fontSize: 12, color: "#e55", margin: "4px 0 0" }}>
+                  {deleteImageIds.length} photo{deleteImageIds.length > 1 ? "s" : ""} will be removed on save.
+                </p>
+              )}
+            </div>
+          )}
+
+          <div className="auth-field">
+            <label className="auth-label">Add New Photos</label>
+            <ImageUpload images={newImages} onChange={setNewImages} />
           </div>
 
           {error && <p className="auth-error">{error}</p>}

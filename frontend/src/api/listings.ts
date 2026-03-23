@@ -55,12 +55,31 @@ export const createListing = (formData: FormData) => {
   }).then((res) => res.data);
 };
 
-export const updateListing = (id: number, data: {
-  title?: string;
-  description?: string;
-  price?: number;
-  category?: string;
-  status?: string;
-}) => {
-  return client.patch<Listing>(`/listings/${id}`, data).then((res) => res.data);
+export const updateListing = (
+  id: number,
+  data: {
+    title?: string;
+    description?: string;
+    price?: number;
+    category?: string;
+    status?: string;
+    newImages?: File[];
+    deleteImageIds?: number[];
+  }
+) => {
+  const formData = new FormData();
+  if (data.title !== undefined) formData.append("title", data.title);
+  if (data.description !== undefined) formData.append("description", data.description);
+  if (data.price !== undefined) formData.append("price", String(data.price));
+  if (data.category !== undefined) formData.append("category", data.category);
+  if (data.status !== undefined) formData.append("status", data.status);
+  if (data.newImages) {
+    data.newImages.forEach((file) => formData.append("new_images", file));
+  }
+  if (data.deleteImageIds) {
+    data.deleteImageIds.forEach((imgId) => formData.append("delete_image_ids", String(imgId)));
+  }
+  return client.patch<Listing>(`/listings/${id}`, formData, {
+    headers: { "Content-Type": undefined },
+  }).then((res) => res.data);
 };

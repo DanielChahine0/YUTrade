@@ -192,6 +192,8 @@ def update_listing(
     listing_id: int,
     seller_id: int,
     update_data,
+    new_images=None,
+    delete_image_ids=None,
 ):
     listing = db.query(Listing).filter(Listing.id == listing_id).first()
 
@@ -215,6 +217,41 @@ def update_listing(
 
     if update_data.status is not None:
         listing.status = update_data.status
+
+    # Delete requested images
+    if delete_image_ids:
+        for image_id in delete_image_ids:
+            image = db.query(Image).filter(
+                Image.id == image_id,
+                Image.listing_id == listing_id,
+            ).first()
+            if image:
+                try:
+                    os.remove(image.file_path)
+                except OSError:
+                    pass
+                db.delete(image)
+
+    # Add new images
+    if new_images:
+        existing_count = db.query(Image).filter(Image.listing_id == listing_id).count()
+        for index, image in enumerate(new_images):
+            ext = ""
+            if image.filename and "." in image.filename:
+                ext = image.filename.rsplit(".", 1)[1]
+
+            filename = f"{uuid4()}.{ext}" if ext else str(uuid4())
+            disk_path = os.path.join(settings.UPLOAD_DIR, filename)
+
+            with open(disk_path, "wb") as file_object:
+                file_object.write(image.file.read())
+
+            image_record = Image(
+                listing_id=listing_id,
+                file_path=f"uploads/{filename}",
+                position=existing_count + index,
+            )
+            db.add(image_record)
 
     listing.updated_at = datetime.utcnow()
 

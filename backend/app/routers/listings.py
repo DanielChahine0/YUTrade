@@ -198,17 +198,22 @@ def get_listing_by_id(
 )
 def update_listing(
     listing_id: int = Path(..., description="The unique numeric ID of the listing to update", ge=1, examples=[42]),
-    update_data: ListingUpdate = ...,
+    title: Optional[str] = Form(None, description="New listing title", max_length=200),
+    description: Optional[str] = Form(None, description="Updated item description"),
+    price: Optional[float] = Form(None, gt=0, description="New asking price in CAD dollars"),
+    category: Optional[str] = Form(None, description="Item category"),
+    status: Optional[str] = Form(None, description="New status: active, sold, or removed"),
+    new_images: List[UploadFile] = File(default=[], description="New image files to add"),
+    delete_image_ids: List[int] = Form(default=[], description="IDs of existing images to delete"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
     Update one or more fields on an existing listing (owner only).
 
-    All fields in the request body are optional — send only the fields you
-    want to change. Valid status transitions:
-    - `active` → `sold` (mark as sold)
-    - `active` → `removed` (take down the listing)
+    Accepts multipart/form-data. All fields are optional — send only what you want to change.
+    - Use `new_images` to upload additional photos.
+    - Use `delete_image_ids` (repeated form field) to remove specific images by their ID.
 
     Only the listing's original seller can perform updates.
 
@@ -216,12 +221,21 @@ def update_listing(
     Returns 404 if no listing exists with the given ID.
     Requires authentication: include `Authorization: Bearer <token>` header.
     """
+    update_data = ListingUpdate(
+        title=title,
+        description=description,
+        price=price,
+        category=category,
+        status=status,
+    )
     try:
         listing = listing_service.update_listing(
             db=db,
             listing_id=listing_id,
             seller_id=current_user.id,
             update_data=update_data,
+            new_images=new_images,
+            delete_image_ids=delete_image_ids,
         )
     except PermissionError:
         raise HTTPException(status_code=403, detail="Not authorized to update this listing")
