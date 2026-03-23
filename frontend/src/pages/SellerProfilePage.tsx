@@ -33,15 +33,7 @@ export default function SellerProfilePage() {
     getListings({})
       .then((data) => {
         const all: Listing[] = data.listings || []
-        const sellerId = parseInt(id)
-        const sellerListings = all.filter((l) => l.seller_id === sellerId)
-
-        setListings(sellerListings)
-
-        if (sellerListings.length > 0) {
-          setSellerName(sellerListings[0].seller.name)
-          setMemberSince(sellerListings[0].seller.created_at)
-        }
+        setListings(all.filter((l) => l.seller_id === parseInt(id)))
       })
       .catch(() => {})
       .finally(() => setLoading(false))
@@ -55,7 +47,7 @@ export default function SellerProfilePage() {
           <span style={{ fontSize: 36, color: "#bbb" }}>👤</span>
         </div>
         <div className="seller-info-col">
-          <h1 className="detail-title" style={{ margin: 0 }}>{sellerName || "York Student"}</h1>
+          <h1 className="detail-title" style={{ margin: 0 }}>{sellerRatings?.seller?.name || "York Student"}</h1>
 
           <div className="seller-rating-row" style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '8px 0' }}>
             <span className="detail-label" style={{ marginBottom: 0 }}>Rating</span>
@@ -75,7 +67,7 @@ export default function SellerProfilePage() {
           </div>
 
           <div className="detail-label">
-            Active since: {memberSince ? formatDate(memberSince) : "—"}
+            Active since: {sellerRatings?.seller?.created_at ? formatDate(sellerRatings.seller.created_at) : "—"}
           </div>
 
          <button

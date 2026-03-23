@@ -4,9 +4,9 @@
 import React, { useState, useEffect, useRef } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { getListing } from "../api/listings"
-import { getMyRating, createRating, updateRating, deleteRating } from "../api/ratings"
+import { getMyRating, createRating, updateRating, deleteRating, getSellerRatings } from "../api/ratings"
 import { useAuth } from "../hooks/useAuth"
-import { Listing, MyRatingOut } from "../types"
+import { Listing, MyRatingOut, SellerRatingsOut } from "../types"
 import { formatPrice, formatDate } from "../utils/validators"
 import StarRating from "../components/StarRating"
 
@@ -22,6 +22,7 @@ export default function ListingDetailPage() {
   const [imgIdx, setImgIdx] = useState(0)
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [myRating, setMyRating] = useState<MyRatingOut | null>(null)
+  const [sellerRatings, setSellerRatings] = useState<SellerRatingsOut | null>(null)
   const [selectedScore, setSelectedScore] = useState(0)
   const [comment, setComment] = useState("")
   const [editMode, setEditMode] = useState(false)
@@ -36,6 +37,13 @@ export default function ListingDetailPage() {
       .catch(() => setError("Listing not found"))
       .finally(() => setLoading(false))
   }, [id])
+
+  useEffect(() => {
+    if (!listing) return
+    getSellerRatings(listing.seller_id)
+      .then(setSellerRatings)
+      .catch(() => {})
+  }, [listing?.seller_id])  // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!listing || !user || user.id === listing.seller_id) return
@@ -96,7 +104,7 @@ export default function ListingDetailPage() {
   const handleUpdateRating = async () => {
     setRatingSubmitting(true); setRatingError("")
     try {
-      await updateRating(listing!.id, { score: selectedScore, comment: comment || undefined })
+      await updateRating(listing!.id, { score: selectedScore, comment: comment })
       const updated = await getMyRating(listing!.id)
       setMyRating(updated); setEditMode(false)
     } catch (e: any) { setRatingError(e.response?.data?.detail ?? "Failed to update rating") }
@@ -179,6 +187,14 @@ export default function ListingDetailPage() {
               </div>
               <div>
                 <div className="detail-seller-name">{listing.seller.name}</div>
+                {sellerRatings && sellerRatings.total_count > 0 && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 2 }}>
+                    <StarRating rating={sellerRatings.average_score ?? 0} size={12} />
+                    <span style={{ fontSize: 12, color: "#555" }}>
+                      {sellerRatings.average_score?.toFixed(1)} ({sellerRatings.total_count})
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 
