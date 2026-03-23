@@ -1,7 +1,7 @@
 // Assigned to: Mai Komar
 // Phase: 2 (F2.4)
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { getListing } from "../api/listings"
 import { useAuth } from "../hooks/useAuth"
@@ -19,6 +19,7 @@ export default function ListingDetailPage() {
   const [error, setError] = useState("")
   const [imgIdx, setImgIdx] = useState(0)
   const [lightboxOpen, setLightboxOpen] = useState(false)
+
 
   useEffect(() => {
     if (!id) return
@@ -140,15 +141,13 @@ export default function ListingDetailPage() {
               View Seller Profile
             </button>
 
-            {!isSeller && (
-              <button
-                className="btn-red-sm"
-                style={{ background: "#1a1a1a" }}
-                onClick={() => navigate("/messages")}
-              >
-                Message Seller
-              </button>
-            )}
+            <button
+              className="btn-red-sm"
+              style={{ background: "#1a1a1a" }}
+              onClick={() => navigate(`/messages?listingId=${listing.id}`)}
+            >
+              {isSeller ? "View Messages" : "Message Seller"}
+            </button>
           </div>
 
         </div>
