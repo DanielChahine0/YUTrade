@@ -43,9 +43,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { getMessages, sendMessage } from '../api/messages'; 
 
-// REMOVED: import './MessageThread.css'; 
-// (We are using the global styles you added to index.css instead)
-
 interface Props {
   listingId: number;
   sellerId: number;
@@ -132,9 +129,11 @@ const MessageThread: React.FC<Props> = ({ listingId, sellerId, currentUserId }) 
             onChange={(e) => setNewMessage(e.target.value)} 
             placeholder="Type a message..." 
             className="auth-input" 
-            style={{ marginBottom: 0 }} // Override any bottom margin from auth-input
+            style={{ marginBottom: 0, flex: 1 }}
           />
-          <button type="submit" className="btn-red-sm">Send</button>
+          <button type="submit" className="btn-red-sm" style={{ width: "auto", padding: "10px 20px", flexShrink: 0 }}>
+            Send
+          </button>
         </form>
       )}
     </div>

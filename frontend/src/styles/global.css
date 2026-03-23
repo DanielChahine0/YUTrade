@@ -852,6 +852,7 @@ a {
   display: flex;
   flex-direction: column;
   height: 450px; /* Essential for the scrollbar to appear */
+  width: 120%;
 }
 
 .messages-list {
