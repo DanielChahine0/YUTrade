@@ -208,7 +208,7 @@ export default function ListingDetailPage() {
             <button
               className="btn-red-sm"
               style={{ background: "#1a1a1a" }}
-              onClick={() => navigate(`/messages?listingId=${listing.id}`)}
+              onClick={() => navigate(isSeller ? "/messages" : `/messages?listingId=${listing.id}`)}
             >
               {isSeller ? "View Messages" : "Message Seller"}
             </button>
