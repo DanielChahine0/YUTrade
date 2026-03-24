@@ -36,6 +36,8 @@ import { useAuth } from "../hooks/useAuth"
 import { getListing, getListings } from "../api/listings"
 import { getAllThreads } from "../api/messages"
 
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000"
+
 const MessagesPage: React.FC = () => {
   const [threads, setThreads] = useState<any[]>([])
   const [loadingThreads, setLoadingThreads] = useState(true)
@@ -59,16 +61,33 @@ const MessagesPage: React.FC = () => {
       .finally(() => setLoadingActive(false))
   }, [listingId])
 
-  useEffect(() => {
+useEffect(() => {
   if (!user) {
     setLoadingThreads(false)
     return
   }
   getAllThreads()
-    .then((data) => setThreads(data.threads || []))
+    .then(async (data) => {
+      const threads = data.threads || []
+      const threadsWithNames = await Promise.all(
+        threads.map(async (thread: any) => {
+          const listing = await getListing(thread.listing_id)
+          console.log(listing.images)
+          return {
+            ...thread,
+            other_user_name: listing.seller.name,
+            listing_image: listing.images?.[0]?.file_path 
+              ? `${API_URL}/${listing.images[0].file_path}` 
+              : null,
+          }
+        })
+      )
+      setThreads(threadsWithNames)
+    })
     .catch((err) => console.error("Failed to load inbox", err))
     .finally(() => setLoadingThreads(false))
 }, [user])
+
   const handleBack = () => {
     navigate("/messages")
   }
@@ -171,7 +190,28 @@ const MessagesPage: React.FC = () => {
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 {/* Avatar */}
                <div className="detail-seller-avatar">
-                {thread.other_user_name?.charAt(0).toUpperCase()}
+                  {thread.listing_image ? (
+                    <img 
+                      src={thread.listing_image}  
+                      alt={thread.listing_title}
+                      style={{ width: 48, height: 48, borderRadius: 8, objectFit: "cover" }}
+                    />
+                  ) : (
+                    <div style={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: 8,
+                      background: "#eee",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "#ccc",
+                      fontSize: 18,
+                    }}>
+                      🖼️
+                    </div>
+                  )}
+                
               </div>
                 <div>
                   <div style={{ fontWeight: 700, fontSize: 14, color: "#1a1a1a" }}>
