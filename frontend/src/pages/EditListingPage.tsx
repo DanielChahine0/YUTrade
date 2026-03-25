@@ -173,7 +173,7 @@ export default function EditListingPage() {
                     >
                       <img
                         src={`${API_URL}/${img.file_path}`}
-                        alt={`Photo ${img.position + 1}`}
+                        alt={`Listing ${img.position + 1}`}
                       />
                       <button
                         type="button"

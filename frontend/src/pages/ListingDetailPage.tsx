@@ -1,7 +1,7 @@
 // Assigned to: Mai Komar
 // Phase: 2 (F2.4)
 
-import React, { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { getListing } from "../api/listings"
 import { getMyRating, createRating, updateRating, deleteRating, getSellerRatings } from "../api/ratings"

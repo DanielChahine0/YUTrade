@@ -33,7 +33,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { formatDate } from "../utils/validators"
 import MessageThread from "../components/MessageThread"
 import { useAuth } from "../hooks/useAuth"
-import { getListing, getListings } from "../api/listings"
+import { getListing } from "../api/listings"
 import { getAllThreads } from "../api/messages"
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000"
