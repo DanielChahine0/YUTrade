@@ -3,6 +3,22 @@ set -e
 
 cd "$(dirname "$0")"
 
+# Kill the uvicorn server on exit (Ctrl+C or script termination)
+cleanup() {
+    echo ""
+    echo "Stopping backend server..."
+    if command -v lsof >/dev/null 2>&1; then
+        lsof -ti:8000 | xargs kill -9 2>/dev/null || true
+    elif command -v netstat >/dev/null 2>&1; then
+        netstat -ano | grep ':8000 ' | grep 'LISTENING' | awk '{print $5}' | sort -u | while read pid; do
+            taskkill //F //PID "$pid" 2>/dev/null || true
+        done
+    fi
+    kill $(jobs -p) 2>/dev/null || true
+    echo "Backend server stopped."
+}
+trap cleanup EXIT INT TERM
+
 # Create virtual environment if it doesn't exist
 if [ ! -d "venv" ]; then
     echo "Creating virtual environment..."
