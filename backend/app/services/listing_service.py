@@ -227,7 +227,9 @@ def update_listing(
             ).first()
             if image:
                 try:
-                    os.remove(image.file_path)
+                    filename = image.file_path.replace("uploads/", "", 1)
+                    disk_path = os.path.join(settings.UPLOAD_DIR, filename)
+                    os.remove(disk_path)
                 except OSError:
                     pass
                 db.delete(image)
@@ -258,3 +260,31 @@ def update_listing(
     db.commit()
 
     return get_listing_by_id(db, listing.id)
+
+
+def delete_listing(db: Session, listing_id: int, seller_id: int) -> bool:
+    """Hard-delete a listing, its images from disk, and all related DB rows."""
+    listing = db.query(Listing).options(joinedload(Listing.images)).filter(Listing.id == listing_id).first()
+
+    if not listing:
+        return None
+
+    if listing.seller_id != seller_id:
+        raise PermissionError("Only the listing owner can delete this listing")
+
+    # Delete image files from disk
+    for image in listing.images:
+        try:
+            filename = image.file_path.replace("uploads/", "", 1)
+            disk_path = os.path.join(settings.UPLOAD_DIR, filename)
+            os.remove(disk_path)
+        except OSError:
+            pass
+
+    # Cascade handles images and ratings; delete messages manually
+    from app.models.message import Message
+    db.query(Message).filter(Message.listing_id == listing_id).delete()
+
+    db.delete(listing)
+    db.commit()
+    return True

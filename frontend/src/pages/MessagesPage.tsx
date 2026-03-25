@@ -72,7 +72,6 @@ useEffect(() => {
       const threadsWithNames = await Promise.all(
         threads.map(async (thread: any) => {
           const listing = await getListing(thread.listing_id)
-          console.log(listing.images)
           return {
             ...thread,
             other_user_name: listing.seller.name,

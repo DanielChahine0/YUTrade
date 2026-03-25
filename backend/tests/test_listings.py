@@ -257,7 +257,7 @@ def test_update_listing_owner(client, auth_headers):
 
     patch_resp = client.patch(
         f"/listings/{listing_id}",
-        json={"title": "New Title", "status": "sold"},
+        data={"title": "New Title", "status": "sold"},
         headers=auth_headers,
     )
     assert patch_resp.status_code == 200, patch_resp.text
@@ -282,7 +282,7 @@ def test_update_listing_not_owner(client, auth_headers, second_auth_headers):
 
     patch_resp = client.patch(
         f"/listings/{listing_id}",
-        json={"status": "removed"},
+        data={"status": "removed"},
         headers=second_auth_headers,
     )
     assert patch_resp.status_code == 403

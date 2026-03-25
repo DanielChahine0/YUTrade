@@ -18,6 +18,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage"
 import EditListingPage from "./pages/EditListingPage"
 import MapsPage from './pages/MapsPage'
 import MessagesPage from "./pages/MessagesPage"
+import AccountPage from "./pages/AccountPage"
 
 function App() {
   return (
@@ -63,6 +64,14 @@ function App() {
           element={
             <ProtectedRoute>
               <MessagesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/account"
+          element={
+            <ProtectedRoute>
+              <AccountPage />
             </ProtectedRoute>
           }
         />

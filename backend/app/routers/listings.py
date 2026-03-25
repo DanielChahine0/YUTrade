@@ -244,3 +244,32 @@ def update_listing(
         raise HTTPException(status_code=404, detail="Listing not found")
 
     return listing
+
+
+@router.delete(
+    "/{listing_id}",
+    status_code=status.HTTP_200_OK,
+    summary="Delete a listing",
+    responses={
+        401: {"description": "Not authenticated"},
+        403: {"description": "You are not the owner of this listing"},
+        404: {"description": "Listing not found"},
+    },
+)
+def delete_listing(
+    listing_id: int = Path(..., description="The unique numeric ID of the listing to delete", ge=1),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Permanently delete a listing and all associated images/messages (owner only).
+    """
+    try:
+        result = listing_service.delete_listing(db=db, listing_id=listing_id, seller_id=current_user.id)
+    except PermissionError:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this listing")
+
+    if result is None:
+        raise HTTPException(status_code=404, detail="Listing not found")
+
+    return {"message": "Listing deleted successfully"}

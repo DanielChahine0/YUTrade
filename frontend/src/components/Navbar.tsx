@@ -58,6 +58,7 @@ export const Navbar: React.FC = () => {
                         <span style={{ borderLeft: "1px solid rgba(255,255,255,0.3)", paddingLeft: "1rem" }}>
                             Hello, {user?.name}
                         </span>
+                        <Link to="/account" style={linkStyle("/account")}>Account</Link>
                         <button onClick={handleLogout} style={{
                             background: "white",
                             color: "#E31837",

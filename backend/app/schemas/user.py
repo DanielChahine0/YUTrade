@@ -28,3 +28,19 @@ class UserOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class UpdateProfileRequest(BaseModel):
+    """Request schema for updating user profile (name only)."""
+    name: str
+
+
+class ChangePasswordRequest(BaseModel):
+    """Request schema for changing password while logged in."""
+    current_password: str
+    new_password: str
+
+
+class DeleteAccountRequest(BaseModel):
+    """Request schema for deleting user account — requires password confirmation."""
+    password: str
