@@ -1292,3 +1292,79 @@ a {
   margin-top: 6px;
   line-height: 1.5;
 }
+
+/* ============================================================
+   SEARCH BAR 
+   ============================================================ */
+  
+   /* ============================================================
+   SEARCH BAR 
+   ============================================================ */
+.search-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: #fff;
+  padding: 14px 16px;
+  border-radius: 12px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.07);
+  margin-bottom: 20px;
+  align-items: center;
+  justify-content: space-between; /* push button to the right */
+}
+
+.search-bar .inputs-group {
+  display: flex;
+  gap: 8px;
+  flex: 1; /* inputs expand to fill available space */
+}
+
+.search-bar input,
+.search-bar select {
+  padding: 8px 10px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 13px;
+  background: #fafafa;
+  color: #222;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.search-bar input:focus,
+.search-bar select:focus {
+  border-color: #E31837;
+  background: #fff;
+}
+
+.search-bar input[type="text"] {
+  flex: 1;
+  min-width: 180px;
+}
+
+.search-bar input[type="number"] {
+  width: 110px;
+}
+
+.search-bar select {
+  min-width: 140px;
+  cursor: pointer;
+}
+
+.search-bar button {
+  flex: 0 0 auto;       /* don’t grow, stay compact */
+  padding: 6px 12px;    /* smaller than inputs */
+  font-size: 12px;      /* smaller text */
+  height: 36px;         /* consistent height with inputs */
+  background: #E31837;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.search-bar button:hover {
+  background: #B8132D;
+}
