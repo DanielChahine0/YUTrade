@@ -1,25 +1,37 @@
 // Assigned to: Harnaindeep Kaur
 // Phase: 1 (F1.7)
 
+
 import React from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate, useLocation } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth"
 
 export const Navbar: React.FC = () => {
     const { isAuthenticated, user, logout } = useAuth()
     const navigate = useNavigate()
+    const location = useLocation()  // <-- get current path
 
     const handleLogout = () => {
         logout()
         navigate("/login")
     }
 
+    // Function to determine if a link is active
+    const isActive = (path: string) => location.pathname === path
+
+    const linkStyle = (path: string) => ({
+        color: "white",
+        textDecoration: "none",
+        fontWeight: isActive(path) ? "bold" : "normal",
+        borderBottom: isActive(path) ? "2px solid #fff" : "none",
+        paddingBottom: "2px",
+    })
+
     return (
         <nav className="navbar" style={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            // Increased padding from 0.5rem to 1.5rem to make it thicker
             padding: "1.5rem 2rem", 
             backgroundColor: "#E31837",
             color: "white",
@@ -34,19 +46,15 @@ export const Navbar: React.FC = () => {
                 YU Trade
             </Link>
 
-            <div className="navbar-links" style={{ 
-                display: "flex", 
-                gap: "1.5rem", 
-                alignItems: "center" 
-            }}>
-                <Link to="/" style={{ color: "white", textDecoration: "none" }}>Browse</Link>
+            <div className="navbar-links" style={{ display: "flex", gap: "1.5rem", alignItems: "center" }}>
+                <Link to="/" style={linkStyle("/")}>Browse</Link>
 
                 {isAuthenticated ? (
                     <>
-                        <Link to="/create" style={{ color: "white", textDecoration: "none" }}>Sell Item</Link>
-                        <Link to="/my-listings" style={{ color: "white", textDecoration: "none" }}>My Listings</Link>
-                        <Link to="/messages" style={{ color: "white", textDecoration: "none" }}>Messages</Link>
-                        <Link to="/maps" style={{ color: "white", textDecoration: "none" }}>Maps</Link>
+                        <Link to="/create" style={linkStyle("/create")}>Sell Item</Link>
+                        <Link to="/my-listings" style={linkStyle("/my-listings")}>My Listings</Link>
+                        <Link to="/messages" style={linkStyle("/messages")}>Messages</Link>
+                        <Link to="/maps" style={linkStyle("/maps")}>Maps</Link>
                         <span style={{ borderLeft: "1px solid rgba(255,255,255,0.3)", paddingLeft: "1rem" }}>
                             Hello, {user?.name}
                         </span>
@@ -64,9 +72,8 @@ export const Navbar: React.FC = () => {
                     </>
                 ) : (
                     <>
-                        <Link to="/login" style={{ color: "white", textDecoration: "none" }}>Login</Link>
-                        <Link to="/register" style={{ color: "white", textDecoration: "none" }}>Register</Link>
-                        
+                        <Link to="/login" style={linkStyle("/login")}>Login</Link>
+                        <Link to="/register" style={linkStyle("/register")}>Register</Link>
                     </>
                 )}
             </div>
