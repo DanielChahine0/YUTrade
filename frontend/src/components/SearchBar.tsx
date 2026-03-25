@@ -101,6 +101,7 @@ const SearchBar: React.FC<Props> = ({ onSearch }) => {
           type="number"
           placeholder="Min"
           value={minPrice}
+          min={0} 
           onChange={(e) => setMinPrice(e.target.value)}
         />
 
@@ -108,6 +109,7 @@ const SearchBar: React.FC<Props> = ({ onSearch }) => {
           type="number"
           placeholder="Max"
           value={maxPrice}
+          min={0} 
           onChange={(e) => setMaxPrice(e.target.value)}
         />
 
