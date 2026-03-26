@@ -23,9 +23,23 @@ from app.config import settings
 
 
 def send_password_reset_email(email: str, code: str) -> None:
-    """Send a password reset code via console log or SMTP."""
+    """Send a password reset code via console log, SMTP, or Resend API."""
     if settings.EMAIL_BACKEND == "console":
         print(f"[DEV] Password reset code for {email}: {code}")
+    elif settings.EMAIL_BACKEND == "resend":
+        import resend
+        resend.api_key = settings.RESEND_API_KEY
+        try:
+            resend.Emails.send({
+                "from": "YU Trade <onboarding@resend.dev>",
+                "to": email,
+                "subject": "YU Trade - Password Reset",
+                "text": f"Your YU Trade password reset code is: {code}\n\nThis code expires in 15 minutes.\n\nIf you did not request a password reset, you can ignore this email.",
+            })
+            print(f"[RESEND] Password reset email sent to {email}")
+        except Exception as e:
+            print(f"[RESEND ERROR] Failed to send reset email to {email}: {e}")
+            print(f"[FALLBACK] Password reset code for {email}: {code}")
     elif settings.EMAIL_BACKEND == "smtp":
         import asyncio
         import aiosmtplib
@@ -60,10 +74,24 @@ def send_password_reset_email(email: str, code: str) -> None:
 
 
 def send_verification_email(email: str, code: str) -> None:
-    """Send a verification code via console log or SMTP."""
+    """Send a verification code via console log, SMTP, or Resend API."""
     if settings.EMAIL_BACKEND == "console":
         # Dev mode — just print the code to the terminal
         print(f"[DEV] Verification code for {email}: {code}")
+    elif settings.EMAIL_BACKEND == "resend":
+        import resend
+        resend.api_key = settings.RESEND_API_KEY
+        try:
+            resend.Emails.send({
+                "from": "YU Trade <onboarding@resend.dev>",
+                "to": email,
+                "subject": "YU Trade - Email Verification",
+                "text": f"Your YU Trade verification code is: {code}\n\nThis code expires in 15 minutes.\n\nIf you did not register for YU Trade, you can ignore this email.",
+            })
+            print(f"[RESEND] Verification email sent to {email}")
+        except Exception as e:
+            print(f"[RESEND ERROR] Failed to send email to {email}: {e}")
+            print(f"[FALLBACK] Verification code for {email}: {code}")
     elif settings.EMAIL_BACKEND == "smtp":
         import asyncio
         import aiosmtplib

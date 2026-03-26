@@ -78,6 +78,8 @@ class Settings:
 
         self.UPLOAD_DIR: str = os.getenv("UPLOAD_DIR", "uploads")
 
+        self.RESEND_API_KEY: str = os.getenv("RESEND_API_KEY", "")
+
         # Optional: enforce secure secret in production
         if self.SECRET_KEY == "dev-secret-key-change-in-production":
             print("⚠️ Warning: Using default SECRET_KEY. Change this in production.")
