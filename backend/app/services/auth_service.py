@@ -308,6 +308,7 @@ def delete_account(db: Session, user_id: int, password: str) -> None:
     from app.models.listing import Listing
     from app.models.image import Image
     from app.models.message import Message
+    from app.models.rating import Rating
 
     listings = db.query(Listing).options(joinedload(Listing.images)).filter(Listing.seller_id == user_id).all()
     for listing in listings:
@@ -327,6 +328,9 @@ def delete_account(db: Session, user_id: int, password: str) -> None:
     # Delete verification and password reset codes
     db.query(VerificationCode).filter(VerificationCode.user_id == user_id).delete()
     db.query(PasswordResetCode).filter(PasswordResetCode.user_id == user_id).delete()
+
+    # Delete ratings given by this user (rater_id is NOT NULL, so must delete explicitly)
+    db.query(Rating).filter(Rating.rater_id == user_id).delete(synchronize_session=False)
 
     # Delete listings (cascades to images and ratings via ORM)
     for listing in listings:
