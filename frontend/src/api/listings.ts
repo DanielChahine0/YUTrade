@@ -83,3 +83,7 @@ export const updateListing = (
     headers: { "Content-Type": undefined },
   }).then((res) => res.data);
 };
+
+export const deleteListing = (id: number) => {
+  return client.delete(`/listings/${id}`).then((res) => res.data);
+};

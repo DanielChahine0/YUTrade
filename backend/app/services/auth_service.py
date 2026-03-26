@@ -29,9 +29,10 @@
 #   - Check is_verified
 #   - Return user if all checks pass, None otherwise
 
+import os
 import random
 from datetime import datetime, timedelta
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from fastapi import HTTPException, status
 
 from app.config import settings
@@ -261,4 +262,75 @@ def reset_password(db: Session, email: str, code: str, new_password: str) -> Non
 
     reset.used = True
     user.password_hash = hash_password(new_password)
+    db.commit()
+
+
+def update_profile(db: Session, user_id: int, name: str) -> User:
+    """Update the user's display name."""
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    user.name = name
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def change_password(db: Session, user_id: int, current_password: str, new_password: str) -> None:
+    """Change password for a logged-in user after verifying their current password."""
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    if not verify_password(current_password, user.password_hash):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Current password is incorrect")
+
+    if len(new_password.encode("utf-8")) > 72:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password cannot be longer than 72 bytes.",
+        )
+
+    user.password_hash = hash_password(new_password)
+    db.commit()
+
+
+def delete_account(db: Session, user_id: int, password: str) -> None:
+    """Permanently delete a user account and all associated data."""
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    if not verify_password(password, user.password_hash):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Password is incorrect")
+
+    # Delete image files from disk for all user's listings
+    from app.models.listing import Listing
+    from app.models.image import Image
+    from app.models.message import Message
+
+    listings = db.query(Listing).options(joinedload(Listing.images)).filter(Listing.seller_id == user_id).all()
+    for listing in listings:
+        for image in listing.images:
+            try:
+                filename = image.file_path.replace("uploads/", "", 1)
+                disk_path = os.path.join(settings.UPLOAD_DIR, filename)
+                os.remove(disk_path)
+            except OSError:
+                pass
+
+    # Delete messages where user is sender or receiver
+    db.query(Message).filter(
+        (Message.sender_id == user_id) | (Message.receiver_id == user_id)
+    ).delete(synchronize_session=False)
+
+    # Delete verification and password reset codes
+    db.query(VerificationCode).filter(VerificationCode.user_id == user_id).delete()
+    db.query(PasswordResetCode).filter(PasswordResetCode.user_id == user_id).delete()
+
+    # Delete listings (cascades to images and ratings via ORM)
+    for listing in listings:
+        db.delete(listing)
+
+    db.delete(user)
     db.commit()

@@ -6,7 +6,7 @@
 
 import React, { useState, useEffect, useContext } from "react"
 import { useNavigate } from "react-router-dom"
-import { getListings, updateListing } from "../api/listings"
+import { getListings, deleteListing } from "../api/listings"
 import { Listing } from "../types"
 import { AuthContext } from "../context/AuthContext"
 import { formatPrice } from "../utils/validators"
@@ -44,10 +44,10 @@ export default function MyListingsPage() {
   }, [user])
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm("Are you sure you want to remove this listing?")) return
+    if (!window.confirm("Are you sure you want to permanently delete this listing? This cannot be undone.")) return
 
     try {
-      await updateListing(id, { status: "removed" })
+      await deleteListing(id)
       setListings((prev) => prev.filter((l) => l.id !== id))
     } catch {
       alert("Failed to delete listing.")

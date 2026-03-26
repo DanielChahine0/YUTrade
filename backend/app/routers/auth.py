@@ -33,15 +33,17 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
-from app.dependencies import get_db
+from app.dependencies import get_db, get_current_user
+from app.models.user import User
 from app.schemas.auth import (
     RegisterRequest, VerifyRequest, LoginRequest, TokenResponse,
     ForgotPasswordRequest, ResetPasswordRequest,
 )
-from app.schemas.user import UserOut
+from app.schemas.user import UserOut, UpdateProfileRequest, ChangePasswordRequest, DeleteAccountRequest
 from app.services.auth_service import (
     register_user, verify_user, authenticate_user, resend_verification_code,
-    request_password_reset, reset_password,
+    request_password_reset, reset_password, update_profile, change_password,
+    delete_account,
 )
 from app.utils.security import create_access_token
 
@@ -93,3 +95,41 @@ def reset_password_endpoint(request: ResetPasswordRequest, db: Session = Depends
     """Reset a user's password using a valid reset code."""
     reset_password(db, request.email, request.code, request.new_password)
     return {"message": "Password reset successfully"}
+
+
+@router.get("/me", response_model=UserOut)
+def get_me(current_user: User = Depends(get_current_user)):
+    """Get the currently authenticated user's profile."""
+    return current_user
+
+
+@router.patch("/me", response_model=UserOut)
+def update_me(
+    request: UpdateProfileRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Update the current user's name."""
+    return update_profile(db, current_user.id, request.name)
+
+
+@router.post("/change-password", status_code=status.HTTP_200_OK)
+def change_password_endpoint(
+    request: ChangePasswordRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Change password for the currently logged-in user."""
+    change_password(db, current_user.id, request.current_password, request.new_password)
+    return {"message": "Password changed successfully"}
+
+
+@router.post("/delete-account", status_code=status.HTTP_200_OK)
+def delete_account_endpoint(
+    request: DeleteAccountRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Permanently delete the current user's account and all associated data."""
+    delete_account(db, current_user.id, request.password)
+    return {"message": "Account deleted successfully"}

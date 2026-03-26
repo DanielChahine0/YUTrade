@@ -210,3 +210,16 @@ export interface RatingUpdate {
   score?: number;
   comment?: string;
 }
+
+export interface UpdateProfileRequest {
+  name: string;
+}
+
+export interface ChangePasswordRequest {
+  current_password: string;
+  new_password: string;
+}
+
+export interface DeleteAccountRequest {
+  password: string;
+}
