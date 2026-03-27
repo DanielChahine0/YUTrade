@@ -54,11 +54,20 @@ CATEGORY_COLORS = {
 
 db = SessionLocal()
 
-# Check if listings already exist (users may exist from real registrations)
-if db.query(Listing).first():
-    print("Database already has listings. Skipping seed.")
+# Check if listings WITH images already exist
+existing_listing = db.query(Listing).first()
+if existing_listing and db.query(Image).first():
+    print("Database already has listings with images. Skipping seed.")
     db.close()
     sys.exit(0)
+
+# If listings exist but no images, wipe them so we re-seed with images
+if existing_listing:
+    print("Found listings without images — clearing and re-seeding...")
+    db.query(Message).delete()
+    db.query(Image).delete()
+    db.query(Listing).delete()
+    db.commit()
 
 print("Seeding database...")
 
