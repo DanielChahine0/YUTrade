@@ -35,33 +35,33 @@ def download_image(url: str):
         return None
 
 
-# Mapping of listing index → image URL (picsum.photos with deterministic seed IDs)
-# Each seed ID produces a consistent real photograph
+# Mapping of listing index → image URL (loremflickr returns keyword-matched photos)
+# lock=N ensures deterministic results per keyword
 LISTING_IMAGE_URLS = [
-    # Textbooks (0-4): book/study themed
-    "https://picsum.photos/seed/textbook1/600/400",
-    "https://picsum.photos/seed/textbook2/600/400",
-    "https://picsum.photos/seed/textbook3/600/400",
-    "https://picsum.photos/seed/textbook4/600/400",
-    "https://picsum.photos/seed/textbook5/600/400",
+    # Textbooks (0-4)
+    "https://loremflickr.com/600/400/data+structures+textbook?lock=1",
+    "https://loremflickr.com/600/400/calculus+textbook?lock=2",
+    "https://loremflickr.com/600/400/algorithms+textbook?lock=3",
+    "https://loremflickr.com/600/400/discrete+mathematics+book?lock=4",
+    "https://loremflickr.com/600/400/operating+systems+textbook?lock=5",
     # Electronics (5-8)
-    "https://picsum.photos/seed/calculator1/600/400",
-    "https://picsum.photos/seed/mouse1/600/400",
-    "https://picsum.photos/seed/airpods1/600/400",
-    "https://picsum.photos/seed/keyboard1/600/400",
+    "https://loremflickr.com/600/400/graphing+calculator?lock=6",
+    "https://loremflickr.com/600/400/wireless+mouse+logitech?lock=7",
+    "https://loremflickr.com/600/400/airpods+pro?lock=8",
+    "https://loremflickr.com/600/400/mechanical+keyboard?lock=9",
     # Furniture (9-11)
-    "https://picsum.photos/seed/shelf1/600/400",
-    "https://picsum.photos/seed/chair1/600/400",
-    "https://picsum.photos/seed/desk1/600/400",
+    "https://loremflickr.com/600/400/bookshelf+ikea?lock=10",
+    "https://loremflickr.com/600/400/ergonomic+desk+chair?lock=11",
+    "https://loremflickr.com/600/400/foldable+study+desk?lock=12",
     # Clothing (12-13)
-    "https://picsum.photos/seed/hoodie1/600/400",
-    "https://picsum.photos/seed/jacket1/600/400",
+    "https://loremflickr.com/600/400/university+hoodie?lock=13",
+    "https://loremflickr.com/600/400/north+face+winter+jacket?lock=14",
     # Other (14-15)
-    "https://picsum.photos/seed/pitcher1/600/400",
-    "https://picsum.photos/seed/cooker1/600/400",
+    "https://loremflickr.com/600/400/brita+water+filter+pitcher?lock=15",
+    "https://loremflickr.com/600/400/slow+cooker+crockpot?lock=16",
     # Sold (16-17)
-    "https://picsum.photos/seed/physics1/600/400",
-    "https://picsum.photos/seed/usbhub1/600/400",
+    "https://loremflickr.com/600/400/physics+textbook?lock=17",
+    "https://loremflickr.com/600/400/usb+c+hub?lock=18",
 ]
 
 
