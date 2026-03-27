@@ -19,22 +19,14 @@
 //   - Return response.data (contains access_token, token_type, user)
 
 import client from "./client"
-import { RegisterRequest, LoginRequest, VerifyRequest, ForgotPasswordRequest, ResetPasswordRequest, UpdateProfileRequest, ChangePasswordRequest, DeleteAccountRequest, User } from "../types"
+import { RegisterRequest, LoginRequest, ForgotPasswordRequest, ResetPasswordRequest, UpdateProfileRequest, ChangePasswordRequest, DeleteAccountRequest, User } from "../types"
 
 export const register = (data: RegisterRequest) => {
     return client.post("/auth/register", data).then((response) => response.data)
 }
 
-export const verify = (data: VerifyRequest) => {
-    return client.post("/auth/verify", data).then((response) => response.data)
-}
-
 export const login = (data: LoginRequest) => {
     return client.post("/auth/login", data).then((response) => response.data)
-}
-
-export const resendVerification = (email: string) => {
-    return client.post(`/auth/resend-verification?email=${encodeURIComponent(email)}`).then((response) => response.data)
 }
 
 export const forgotPassword = (data: ForgotPasswordRequest) => {

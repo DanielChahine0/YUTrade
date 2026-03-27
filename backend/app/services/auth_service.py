@@ -37,20 +37,16 @@ from fastapi import HTTPException, status
 
 from app.config import settings
 from app.models.user import User
-from app.models.verification import VerificationCode
 from app.models.password_reset import PasswordResetCode
 from app.utils.security import hash_password, verify_password
-from app.services.email_service import send_verification_email, send_password_reset_email
+from app.services.email_service import send_password_reset_email
 
 ALLOWED_DOMAINS = ("@my.yorku.ca", "@yorku.ca")
 
 
 def purge_expired_codes(db: Session) -> None:
-    """Delete all expired or used verification and password-reset codes."""
+    """Delete all expired or used password-reset codes."""
     now = datetime.utcnow()
-    db.query(VerificationCode).filter(
-        (VerificationCode.expires_at <= now) | (VerificationCode.used == True)
-    ).delete(synchronize_session=False)
     db.query(PasswordResetCode).filter(
         (PasswordResetCode.expires_at <= now) | (PasswordResetCode.used == True)
     ).delete(synchronize_session=False)
@@ -84,96 +80,18 @@ def register_user(db: Session, email: str, password: str, name: str) -> User:
             detail="Password cannot be longer than 72 bytes.",
         )
 
-    # Create user
+    # Create user (auto-verified — no email verification required)
     user = User(
         email=email_lower,
         password_hash=hash_password(password),
         name=name,
-        is_verified=False,
+        is_verified=True,
     )
     db.add(user)
     db.commit()
     db.refresh(user)
 
-    # Delete any old verification codes for this user before creating a new one
-    db.query(VerificationCode).filter(VerificationCode.user_id == user.id).delete()
-
-    # Generate and save verification code
-    code = str(random.randint(100000, 999999))
-    verification = VerificationCode(
-        user_id=user.id,
-        code=code,
-        expires_at=datetime.utcnow() + timedelta(minutes=settings.VERIFICATION_CODE_EXPIRE_MINUTES),
-    )
-    db.add(verification)
-    db.commit()
-
-    # Send verification email (console or SMTP)
-    send_verification_email(email_lower, code)
-
     return user
-
-
-def resend_verification_code(db: Session, email: str) -> None:
-    """Delete old codes and issue a fresh verification code for an unverified user."""
-    purge_expired_codes(db)
-
-    user = db.query(User).filter(User.email == email.lower()).first()
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-    if user.is_verified:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email is already verified")
-
-    # Delete old codes
-    db.query(VerificationCode).filter(VerificationCode.user_id == user.id).delete()
-
-    code = str(random.randint(100000, 999999))
-    verification = VerificationCode(
-        user_id=user.id,
-        code=code,
-        expires_at=datetime.utcnow() + timedelta(minutes=settings.VERIFICATION_CODE_EXPIRE_MINUTES),
-    )
-    db.add(verification)
-    db.commit()
-
-    send_verification_email(email.lower(), code)
-
-
-def verify_user(db: Session, email: str, code: str) -> bool:
-    """Verify a user's email with the provided code."""
-    purge_expired_codes(db)
-
-    user = db.query(User).filter(User.email == email.lower()).first()
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User not found",
-        )
-
-    # Find the most recent unused, non-expired verification code
-    verification = (
-        db.query(VerificationCode)
-        .filter(
-            VerificationCode.user_id == user.id,
-            VerificationCode.used == False,
-            VerificationCode.expires_at > datetime.utcnow(),
-        )
-        .order_by(VerificationCode.id.desc())
-        .first()
-    )
-
-    if not verification or verification.code != code:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid or expired verification code",
-        )
-
-    # Mark code as used and verify the user
-    verification.used = True
-    user.is_verified = True
-    db.commit()
-
-    return True
 
 
 def authenticate_user(db: Session, email: str, password: str) -> User:
@@ -189,12 +107,6 @@ def authenticate_user(db: Session, email: str, password: str) -> User:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid password",
-        )
-
-    if not user.is_verified:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Email not verified. Please verify your email first.",
         )
 
     return user
@@ -325,8 +237,7 @@ def delete_account(db: Session, user_id: int, password: str) -> None:
         (Message.sender_id == user_id) | (Message.receiver_id == user_id)
     ).delete(synchronize_session=False)
 
-    # Delete verification and password reset codes
-    db.query(VerificationCode).filter(VerificationCode.user_id == user_id).delete()
+    # Delete password reset codes
     db.query(PasswordResetCode).filter(PasswordResetCode.user_id == user_id).delete()
 
     # Delete ratings given by this user (rater_id is NOT NULL, so must delete explicitly)

@@ -6,7 +6,6 @@ import { Routes, Route } from "react-router-dom"
 import ProtectedRoute from "./components/ProtectedRoute"
 import { Layout } from "./components/Layout"
 import RegisterPage from "./pages/RegisterPage"
-import VerifyPage from "./pages/VerifyPage"
 import LoginPage from "./pages/LoginPage"
 import CreateListingPage from "./pages/CreateListingPage"
 import ListingDetailPage from "./pages/ListingDetailPage"
@@ -27,7 +26,6 @@ function App() {
         <Route path="/" element={<BrowsePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/verify" element={<VerifyPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/listings/:id" element={<ListingDetailPage />} />

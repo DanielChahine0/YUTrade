@@ -54,18 +54,6 @@ class RegisterRequest(BaseModel):
         return v.strip()
 
 
-class VerifyRequest(BaseModel):
-    email: EmailStr
-    code: str
-
-    @field_validator("code")
-    @classmethod
-    def validate_code_length(cls, v: str) -> str:
-        if len(v) != 6:
-            raise ValueError("Code must be exactly 6 characters")
-        return v
-
-
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str

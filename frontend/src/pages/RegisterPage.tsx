@@ -54,7 +54,7 @@ const RegisterPage: React.FC = () => {
     setLoading(true)
     try {
       await register({ name, email, password })
-      navigate(`/verify?email=${encodeURIComponent(email)}`)
+      navigate("/login")
     } catch (err: any) {
       if (err.response?.status === 409) {
         setError("Email already registered")

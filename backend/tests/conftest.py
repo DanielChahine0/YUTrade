@@ -42,7 +42,7 @@ from fastapi.testclient import TestClient
 from app.database import Base
 from app.dependencies import get_db
 from app.main import app
-from app.models import User, VerificationCode, Listing, Image, Message, Rating  # noqa: F401 — register all models
+from app.models import User, Listing, Image, Message, Rating  # noqa: F401 — register all models
 
 
 # Create a single test engine shared across the test session
@@ -82,22 +82,13 @@ def client(db_session):
 
 
 @pytest.fixture
-def auth_headers(client, db_session):
-    """Register, verify, and login a test user. Return auth headers."""
-    # Register
+def auth_headers(client):
+    """Register and login a test user. Return auth headers."""
     client.post("/auth/register", json={
         "email": "testuser@my.yorku.ca",
         "password": "testpass123",
         "name": "Test User",
     })
-    # Retrieve verification code from DB
-    code_row = db_session.query(VerificationCode).order_by(VerificationCode.id.desc()).first()
-    # Verify
-    client.post("/auth/verify", json={
-        "email": "testuser@my.yorku.ca",
-        "code": code_row.code,
-    })
-    # Login
     resp = client.post("/auth/login", json={
         "email": "testuser@my.yorku.ca",
         "password": "testpass123",
@@ -107,21 +98,12 @@ def auth_headers(client, db_session):
 
 
 @pytest.fixture
-def second_auth_headers(client, db_session):
-    """Register, verify, and login a second test user. Return auth headers."""
+def second_auth_headers(client):
+    """Register and login a second test user. Return auth headers."""
     client.post("/auth/register", json={
         "email": "testuser2@my.yorku.ca",
         "password": "testpass456",
         "name": "Test User 2",
-    })
-    code_row = (
-        db_session.query(VerificationCode)
-        .order_by(VerificationCode.id.desc())
-        .first()
-    )
-    client.post("/auth/verify", json={
-        "email": "testuser2@my.yorku.ca",
-        "code": code_row.code,
     })
     resp = client.post("/auth/login", json={
         "email": "testuser2@my.yorku.ca",

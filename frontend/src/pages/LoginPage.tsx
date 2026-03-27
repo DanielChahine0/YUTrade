@@ -54,7 +54,6 @@ export default function LoginPage() {
     } catch (err: any) {
       if (err?.response?.status === 404) setError("__no_account__");
       else if (err?.response?.status === 401) setError("Invalid password. Please try again.");
-      else if (err?.response?.status === 403) setError("Please verify your email first.");
       else setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);

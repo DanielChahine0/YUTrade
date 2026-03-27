@@ -132,11 +132,6 @@ export interface LoginRequest {
   password: string;
 }
 
-export interface VerifyRequest {
-  email: string;
-  code: string;
-}
-
 export interface ListingCreateForm {
   title: string;
   description: string;

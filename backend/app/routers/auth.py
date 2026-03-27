@@ -36,12 +36,12 @@ from sqlalchemy.orm import Session
 from app.dependencies import get_db, get_current_user
 from app.models.user import User
 from app.schemas.auth import (
-    RegisterRequest, VerifyRequest, LoginRequest, TokenResponse,
+    RegisterRequest, LoginRequest, TokenResponse,
     ForgotPasswordRequest, ResetPasswordRequest,
 )
 from app.schemas.user import UserOut, UpdateProfileRequest, ChangePasswordRequest, DeleteAccountRequest
 from app.services.auth_service import (
-    register_user, verify_user, authenticate_user, resend_verification_code,
+    register_user, authenticate_user,
     request_password_reset, reset_password, update_profile, change_password,
     delete_account,
 )
@@ -52,23 +52,9 @@ router = APIRouter()
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 def register(request: RegisterRequest, db: Session = Depends(get_db)):
-    """Register a new user and send a verification code."""
+    """Register a new user."""
     user = register_user(db, request.email, request.password, request.name)
-    return {"message": "Verification code sent to your email", "user_id": user.id}
-
-
-@router.post("/verify", status_code=status.HTTP_200_OK)
-def verify(request: VerifyRequest, db: Session = Depends(get_db)):
-    """Verify a user's email with the provided 6-digit code."""
-    verify_user(db, request.email, request.code)
-    return {"message": "Email verified successfully"}
-
-
-@router.post("/resend-verification", status_code=status.HTTP_200_OK)
-def resend_verification(email: str, db: Session = Depends(get_db)):
-    """Resend a verification code to an unverified user."""
-    resend_verification_code(db, email)
-    return {"message": "Verification code resent"}
+    return {"message": "Account created successfully", "user_id": user.id}
 
 
 @router.post("/login", response_model=TokenResponse)
