@@ -2,9 +2,9 @@
 
 import sys
 import os
-import struct
-import zlib
 from uuid import uuid4
+from urllib.request import urlopen, Request
+from urllib.error import URLError
 
 sys.path.insert(0, os.path.dirname(__file__))
 
@@ -24,32 +24,45 @@ os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 Base.metadata.create_all(bind=engine)
 
 
-def make_placeholder_png(width: int, height: int, r: int, g: int, b: int) -> bytes:
-    """Generate a minimal solid-color PNG using only the standard library."""
-    def _chunk(chunk_type: bytes, data: bytes) -> bytes:
-        c = chunk_type + data
-        return struct.pack(">I", len(data)) + c + struct.pack(">I", zlib.crc32(c) & 0xFFFFFFFF)
-
-    raw = b""
-    row = b""
-    for _ in range(width):
-        row += struct.pack("BBB", r, g, b)
-    for _ in range(height):
-        raw += b"\x00" + row  # filter byte 0 (None) per row
-
-    header = struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0)
-    sig = b"\x89PNG\r\n\x1a\n"
-    return sig + _chunk(b"IHDR", header) + _chunk(b"IDAT", zlib.compress(raw)) + _chunk(b"IEND", b"")
+def download_image(url: str):
+    """Download an image from a URL. Returns bytes or None on failure."""
+    try:
+        req = Request(url, headers={"User-Agent": "YUTrade-Seed/1.0"})
+        with urlopen(req, timeout=15) as resp:
+            return resp.read()
+    except (URLError, OSError) as e:
+        print(f"    Warning: Failed to download {url}: {e}")
+        return None
 
 
-# Category-based colors (R, G, B) for placeholder images
-CATEGORY_COLORS = {
-    "Textbooks":  (66, 133, 244),   # blue
-    "Electronics": (52, 168, 83),    # green
-    "Furniture":  (251, 188, 4),     # yellow
-    "Clothing":   (234, 67, 53),     # red
-    "Other":      (142, 124, 195),   # purple
-}
+# Mapping of listing index → image URL (picsum.photos with deterministic seed IDs)
+# Each seed ID produces a consistent real photograph
+LISTING_IMAGE_URLS = [
+    # Textbooks (0-4): book/study themed
+    "https://picsum.photos/seed/textbook1/600/400",
+    "https://picsum.photos/seed/textbook2/600/400",
+    "https://picsum.photos/seed/textbook3/600/400",
+    "https://picsum.photos/seed/textbook4/600/400",
+    "https://picsum.photos/seed/textbook5/600/400",
+    # Electronics (5-8)
+    "https://picsum.photos/seed/calculator1/600/400",
+    "https://picsum.photos/seed/mouse1/600/400",
+    "https://picsum.photos/seed/airpods1/600/400",
+    "https://picsum.photos/seed/keyboard1/600/400",
+    # Furniture (9-11)
+    "https://picsum.photos/seed/shelf1/600/400",
+    "https://picsum.photos/seed/chair1/600/400",
+    "https://picsum.photos/seed/desk1/600/400",
+    # Clothing (12-13)
+    "https://picsum.photos/seed/hoodie1/600/400",
+    "https://picsum.photos/seed/jacket1/600/400",
+    # Other (14-15)
+    "https://picsum.photos/seed/pitcher1/600/400",
+    "https://picsum.photos/seed/cooker1/600/400",
+    # Sold (16-17)
+    "https://picsum.photos/seed/physics1/600/400",
+    "https://picsum.photos/seed/usbhub1/600/400",
+]
 
 
 db = SessionLocal()
@@ -146,19 +159,21 @@ print(f"  Created {len(listings_data)} listings")
 
 # ── Images ────────────────────────────────────────────────────────────────
 image_count = 0
-for listing in listings_data:
-    color = CATEGORY_COLORS.get(listing.category, (128, 128, 128))
-    png_bytes = make_placeholder_png(400, 300, *color)
-    filename = f"{uuid4()}.png"
-    disk_path = os.path.join(settings.UPLOAD_DIR, filename)
-    with open(disk_path, "wb") as f:
-        f.write(png_bytes)
-    img = Image(listing_id=listing.id, file_path=f"uploads/{filename}", position=0)
-    db.add(img)
-    image_count += 1
+print("  Downloading images...")
+for i, listing in enumerate(listings_data):
+    url = LISTING_IMAGE_URLS[i] if i < len(LISTING_IMAGE_URLS) else f"https://picsum.photos/seed/listing{i}/600/400"
+    img_bytes = download_image(url)
+    if img_bytes:
+        filename = f"{uuid4()}.jpg"
+        disk_path = os.path.join(settings.UPLOAD_DIR, filename)
+        with open(disk_path, "wb") as f:
+            f.write(img_bytes)
+        img = Image(listing_id=listing.id, file_path=f"uploads/{filename}", position=0)
+        db.add(img)
+        image_count += 1
 db.commit()
 
-print(f"  Created {image_count} placeholder images")
+print(f"  Downloaded {image_count} images")
 
 # ── Messages ───────────────────────────────────────────────────────────────
 # Daniel asks Raj about the Data Structures textbook
