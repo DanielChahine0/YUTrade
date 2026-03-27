@@ -2,6 +2,9 @@
 
 import sys
 import os
+import struct
+import zlib
+from uuid import uuid4
 
 sys.path.insert(0, os.path.dirname(__file__))
 
@@ -12,9 +15,42 @@ from app.models.listing import Listing
 from app.models.image import Image
 from app.models.message import Message
 from app.utils.security import hash_password
+from app.config import settings
+
+# Ensure uploads directory exists
+os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 
 # Ensure tables exist
 Base.metadata.create_all(bind=engine)
+
+
+def make_placeholder_png(width: int, height: int, r: int, g: int, b: int) -> bytes:
+    """Generate a minimal solid-color PNG using only the standard library."""
+    def _chunk(chunk_type: bytes, data: bytes) -> bytes:
+        c = chunk_type + data
+        return struct.pack(">I", len(data)) + c + struct.pack(">I", zlib.crc32(c) & 0xFFFFFFFF)
+
+    raw = b""
+    row = b""
+    for _ in range(width):
+        row += struct.pack("BBB", r, g, b)
+    for _ in range(height):
+        raw += b"\x00" + row  # filter byte 0 (None) per row
+
+    header = struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0)
+    sig = b"\x89PNG\r\n\x1a\n"
+    return sig + _chunk(b"IHDR", header) + _chunk(b"IDAT", zlib.compress(raw)) + _chunk(b"IEND", b"")
+
+
+# Category-based colors (R, G, B) for placeholder images
+CATEGORY_COLORS = {
+    "Textbooks":  (66, 133, 244),   # blue
+    "Electronics": (52, 168, 83),    # green
+    "Furniture":  (251, 188, 4),     # yellow
+    "Clothing":   (234, 67, 53),     # red
+    "Other":      (142, 124, 195),   # purple
+}
+
 
 db = SessionLocal()
 
@@ -98,6 +134,22 @@ for listing in listings_data:
     db.refresh(listing)
 
 print(f"  Created {len(listings_data)} listings")
+
+# ── Images ────────────────────────────────────────────────────────────────
+image_count = 0
+for listing in listings_data:
+    color = CATEGORY_COLORS.get(listing.category, (128, 128, 128))
+    png_bytes = make_placeholder_png(400, 300, *color)
+    filename = f"{uuid4()}.png"
+    disk_path = os.path.join(settings.UPLOAD_DIR, filename)
+    with open(disk_path, "wb") as f:
+        f.write(png_bytes)
+    img = Image(listing_id=listing.id, file_path=f"uploads/{filename}", position=0)
+    db.add(img)
+    image_count += 1
+db.commit()
+
+print(f"  Created {image_count} placeholder images")
 
 # ── Messages ───────────────────────────────────────────────────────────────
 # Daniel asks Raj about the Data Structures textbook
