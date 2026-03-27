@@ -35,33 +35,32 @@ def download_image(url: str):
         return None
 
 
-# Mapping of listing index → image URL (loremflickr returns keyword-matched photos)
-# lock=N ensures deterministic results per keyword
+# Curated Unsplash image URLs — each matches the listing item
 LISTING_IMAGE_URLS = [
     # Textbooks (0-4)
-    "https://loremflickr.com/600/400/data+structures+textbook?lock=1",
-    "https://loremflickr.com/600/400/calculus+textbook?lock=2",
-    "https://loremflickr.com/600/400/algorithms+textbook?lock=3",
-    "https://loremflickr.com/600/400/discrete+mathematics+book?lock=4",
-    "https://loremflickr.com/600/400/operating+systems+textbook?lock=5",
+    "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=600&h=400&fit=crop",   # open book
+    "https://images.unsplash.com/photo-1596495578065-6e0763fa1178?w=600&h=400&fit=crop",   # math equations
+    "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&h=400&fit=crop",      # stack of books
+    "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=600&h=400&fit=crop",    # math/chalkboard
+    "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=600&h=400&fit=crop",    # textbooks
     # Electronics (5-8)
-    "https://loremflickr.com/600/400/graphing+calculator?lock=6",
-    "https://loremflickr.com/600/400/wireless+mouse+logitech?lock=7",
-    "https://loremflickr.com/600/400/airpods+pro?lock=8",
-    "https://loremflickr.com/600/400/mechanical+keyboard?lock=9",
+    "https://images.unsplash.com/photo-1564466809058-bf4114d55352?w=600&h=400&fit=crop",    # calculator
+    "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=600&h=400&fit=crop",    # computer mouse
+    "https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?w=600&h=400&fit=crop",    # airpods
+    "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=600&h=400&fit=crop",    # mechanical keyboard
     # Furniture (9-11)
-    "https://loremflickr.com/600/400/bookshelf+ikea?lock=10",
-    "https://loremflickr.com/600/400/ergonomic+desk+chair?lock=11",
-    "https://loremflickr.com/600/400/foldable+study+desk?lock=12",
+    "https://images.unsplash.com/photo-1594620302200-9a762244a156?w=600&h=400&fit=crop",    # bookshelf
+    "https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=600&h=400&fit=crop",    # desk chair
+    "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=600&h=400&fit=crop",    # desk/workspace
     # Clothing (12-13)
-    "https://loremflickr.com/600/400/university+hoodie?lock=13",
-    "https://loremflickr.com/600/400/north+face+winter+jacket?lock=14",
+    "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=400&fit=crop",      # hoodie
+    "https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=600&h=400&fit=crop",    # winter jacket
     # Other (14-15)
-    "https://loremflickr.com/600/400/brita+water+filter+pitcher?lock=15",
-    "https://loremflickr.com/600/400/slow+cooker+crockpot?lock=16",
+    "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?w=600&h=400&fit=crop",      # water pitcher
+    "https://images.unsplash.com/photo-1585515320310-259814833e62?w=600&h=400&fit=crop",    # slow cooker
     # Sold (16-17)
-    "https://loremflickr.com/600/400/physics+textbook?lock=17",
-    "https://loremflickr.com/600/400/usb+c+hub?lock=18",
+    "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600&h=400&fit=crop",    # physics equations
+    "https://images.unsplash.com/photo-1625842268584-8f3296236761?w=600&h=400&fit=crop",    # USB hub
 ]
 
 
