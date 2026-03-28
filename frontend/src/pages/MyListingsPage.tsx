@@ -36,10 +36,10 @@ export default function MyListingsPage() {
   useEffect(() => {
     if (!user?.id) return
 
-    getListings({})
+    getListings({ status: "all" })
       .then((data) => {
         const all: Listing[] = data.listings || []
-        setListings(all.filter((l) => l.seller_id === user?.id))
+        setListings(all.filter((l) => l.seller_id === user?.id && l.status !== "removed"))
       })
       .catch(() => {})
       .finally(() => setLoading(false))

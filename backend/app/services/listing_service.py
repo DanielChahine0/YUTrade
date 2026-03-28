@@ -121,7 +121,8 @@ def get_listings(
         joinedload(Listing.seller),
     )
 
-    query = query.filter(Listing.status == status)
+    if status != "all":
+        query = query.filter(Listing.status == status)
 
     if search:
         query = query.filter(
