@@ -98,7 +98,7 @@ export interface Listing {
   description: string | null;
   price: number;
   category: string | null;
-  status: "active" | "sold" | "removed";
+  status: "active" | "pending" | "sold" | "removed";
   images: Image[];
   created_at: string;
   updated_at: string;
@@ -118,6 +118,7 @@ export interface Message {
   receiver_id: number;
   sender: { id: number; name: string };
   content: string;
+  is_read: boolean;
   created_at: string;
 }
 
@@ -159,7 +160,7 @@ export interface ListingUpdate {
   description?: string;
   price?: number;
   category?: string;
-  status?: "active" | "sold" | "removed";
+  status?: "active" | "pending" | "sold" | "removed";
 }
 
 export interface RaterOut {

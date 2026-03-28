@@ -13,7 +13,7 @@
 #   - category: String(50), nullable=True
 #       Example values: "Textbooks", "Electronics", "Furniture", "Clothing", "Other"
 #   - status: String(20), nullable=False, default="active", index=True
-#       Possible values: "active", "sold", "removed"
+#       Possible values: "active", "pending", "sold", "removed"
 #   - created_at: DateTime, nullable=False, default=datetime.utcnow
 #   - updated_at: DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
 #

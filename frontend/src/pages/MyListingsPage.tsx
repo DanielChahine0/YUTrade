@@ -15,12 +15,14 @@ const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000"
 
 function statusLabel(status: string) {
   if (status === "active") return "Active"
+  if (status === "pending") return "Pending"
   if (status === "sold") return "Sold"
   return "Inactive"
 }
 
 function statusClass(status: string) {
   if (status === "active") return "status-pill status-pill-active"
+  if (status === "pending") return "status-pill status-pill-pending"
   if (status === "sold") return "status-pill status-pill-sold"
   return "status-pill status-pill-inactive"
 }
@@ -34,10 +36,10 @@ export default function MyListingsPage() {
   useEffect(() => {
     if (!user?.id) return
 
-    getListings({})
+    getListings({ status: "all" })
       .then((data) => {
         const all: Listing[] = data.listings || []
-        setListings(all.filter((l) => l.seller_id === user?.id))
+        setListings(all.filter((l) => l.seller_id === user?.id && l.status !== "removed"))
       })
       .catch(() => {})
       .finally(() => setLoading(false))

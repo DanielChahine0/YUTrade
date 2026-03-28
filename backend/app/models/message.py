@@ -10,6 +10,7 @@
 #   - sender_id: Integer, ForeignKey("users.id"), nullable=False, index=True
 #   - receiver_id: Integer, ForeignKey("users.id"), nullable=False, index=True
 #   - content: Text, nullable=False
+#   - is_read: Boolean, nullable=False, default=False
 #   - created_at: DateTime, nullable=False, default=datetime.utcnow
 #
 # Relationships:
@@ -18,7 +19,7 @@
 #   - receiver: relationship("User", foreign_keys=[receiver_id])
 
 from datetime import datetime
-from sqlalchemy import Column, Integer, Text, DateTime, ForeignKey
+from sqlalchemy import Boolean, Column, Integer, Text, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from app.database import Base
 
@@ -31,6 +32,7 @@ class Message(Base):
     sender_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     receiver_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     content = Column(Text, nullable=False)
+    is_read = Column(Boolean, nullable=False, default=False)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
 
     listing = relationship("Listing", back_populates="messages")

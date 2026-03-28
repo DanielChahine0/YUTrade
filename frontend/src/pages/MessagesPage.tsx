@@ -232,8 +232,24 @@ useEffect(() => {
                   </div>
                 </div>
               </div>
-              <div style={{ fontSize: 12, color: "#bbb", flexShrink: 0, marginLeft: 16 }}>
-                {formatDate(thread.last_message_at)}
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", flexShrink: 0, marginLeft: 16, gap: 6 }}>
+                <span style={{ fontSize: 12, color: "#bbb" }}>
+                  {formatDate(thread.last_message_at)}
+                </span>
+                {thread.unread_count > 0 && (
+                  <span style={{
+                    background: "#E31837",
+                    color: "#fff",
+                    borderRadius: 10,
+                    padding: "1px 8px",
+                    fontSize: 11,
+                    fontWeight: 700,
+                    minWidth: 20,
+                    textAlign: "center",
+                  }}>
+                    {thread.unread_count}
+                  </span>
+                )}
               </div>
             </div>
           ))}

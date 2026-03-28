@@ -865,6 +865,7 @@ a {
 }
 
 .status-pill-active   { background: #1a1a1a; color: #fff; }
+.status-pill-pending  { background: #fff3cd; color: #856404; }
 .status-pill-sold     { background: #f0f0f0; color: #888; }
 .status-pill-inactive { background: #f0f0f0; color: #888; }
 
