@@ -28,3 +28,7 @@ export const getMessages = (listingId: number) => {
 export const getAllThreads = () => {
   return client.get<{ threads: any[] }>(`/messages/threads`).then((res) => res.data)
 }
+
+export const markMessagesRead = (listingId: number) => {
+  return client.put<{ marked_read: number }>(`/listings/${listingId}/messages/read`).then((res) => res.data)
+}

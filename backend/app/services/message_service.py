@@ -80,7 +80,39 @@ def get_messages(db: Session, listing_id: int, user_id: int) -> list[Message]:
         .order_by(Message.created_at.asc())
         .all()
     )
+
+    # Mark unread messages addressed to this user as read
+    unread_ids = [
+        m.id for m in messages
+        if not m.is_read and m.receiver_id == user_id
+    ]
+    if unread_ids:
+        db.query(Message).filter(Message.id.in_(unread_ids)).update(
+            {Message.is_read: True}, synchronize_session="fetch"
+        )
+        db.commit()
+        # Refresh in-memory objects so the response reflects is_read=True
+        for m in messages:
+            if m.id in unread_ids:
+                m.is_read = True
+
     return messages
+
+
+def mark_messages_read(db: Session, listing_id: int, user_id: int) -> int:
+    """Mark all unread messages in a listing thread as read for the given user.
+    Returns the number of messages marked."""
+    count = (
+        db.query(Message)
+        .filter(
+            Message.listing_id == listing_id,
+            Message.receiver_id == user_id,
+            Message.is_read == False,  # noqa: E712
+        )
+        .update({Message.is_read: True}, synchronize_session="fetch")
+    )
+    db.commit()
+    return count
 
 
 def get_user_threads(db: Session, user_id: int) -> list[dict]:
@@ -107,6 +139,10 @@ def get_user_threads(db: Session, user_id: int) -> list[dict]:
     for (listing_id, other_user_id), messages in threads.items():
         latest = max(messages, key=lambda m: m.created_at)
         listing = db.query(Listing).filter(Listing.id == listing_id).first()
+        unread_count = sum(
+            1 for m in messages
+            if not m.is_read and m.receiver_id == user_id
+        )
 
         result.append(
             {
@@ -116,6 +152,7 @@ def get_user_threads(db: Session, user_id: int) -> list[dict]:
                 "last_message": latest.content,
                 "last_message_at": latest.created_at,
                 "message_count": len(messages),
+                "unread_count": unread_count,
             }
         )
 

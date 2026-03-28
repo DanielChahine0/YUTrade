@@ -154,6 +154,7 @@ export default function EditListingPage() {
               onChange={(e) => setStatus(e.target.value)}
             >
               <option value="active">Active</option>
+              <option value="pending">Pending</option>
               <option value="sold">Sold</option>
               <option value="removed">Removed</option>
             </select>

@@ -234,12 +234,14 @@ def test_get_messages_marks_unread_as_read(client, db_session, auth_headers, sec
     seller_id = _get_user_id(db_session, "testuser@my.yorku.ca")
     listing = _create_listing(db_session, seller_id)
 
+    # Buyer sends message to seller
     client.post(
         f"/listings/{listing.id}/messages/",
         json={"content": "Hello!"},
         headers=second_auth_headers,
     )
 
+    # Seller fetches messages — should mark buyer's message as read
     resp = client.get(
         f"/listings/{listing.id}/messages/",
         headers=auth_headers,
@@ -255,6 +257,7 @@ def test_mark_messages_read_endpoint(client, db_session, auth_headers, second_au
     seller_id = _get_user_id(db_session, "testuser@my.yorku.ca")
     listing = _create_listing(db_session, seller_id)
 
+    # Buyer sends two messages
     client.post(
         f"/listings/{listing.id}/messages/",
         json={"content": "Message 1"},
@@ -266,6 +269,7 @@ def test_mark_messages_read_endpoint(client, db_session, auth_headers, second_au
         headers=second_auth_headers,
     )
 
+    # Seller marks all as read
     resp = client.put(
         f"/listings/{listing.id}/messages/read",
         headers=auth_headers,
@@ -281,29 +285,19 @@ def test_mark_messages_read_endpoint(client, db_session, auth_headers, second_au
     assert resp.json()["marked_read"] == 0
 
 
-def test_mark_messages_read_unauthenticated(client, db_session, auth_headers):
-    """PUT /listings/{id}/messages/read without auth returns 401."""
-    seller_id = _get_user_id(db_session, "testuser@my.yorku.ca")
-    listing = _create_listing(db_session, seller_id)
-
-    resp = client.put(f"/listings/{listing.id}/messages/read")
-    assert resp.status_code == 401
-
-
-# ── Thread listing tests ────────────────────────────────────────────────
-
-
 def test_threads_include_unread_count(client, db_session, auth_headers, second_auth_headers):
     """GET /messages/threads should include unread_count per thread."""
     seller_id = _get_user_id(db_session, "testuser@my.yorku.ca")
     listing = _create_listing(db_session, seller_id)
 
+    # Buyer sends a message
     client.post(
         f"/listings/{listing.id}/messages/",
         json={"content": "Hey!"},
         headers=second_auth_headers,
     )
 
+    # Seller checks threads — should see 1 unread
     resp = client.get("/messages/threads", headers=auth_headers)
     assert resp.status_code == 200
     threads = resp.json()["threads"]

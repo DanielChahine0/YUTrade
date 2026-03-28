@@ -67,7 +67,8 @@ Key behaviors:
 ### Data Model
 - `users` → `listings` (one-to-many) → `images` (cascade delete)
 - `messages` link sender, receiver, and listing_id; message routes are nested under `/listings/{id}/messages`
-- Listing statuses: `active`, `sold`, `removed`
+- Listing statuses: `active`, `pending`, `sold`, `removed`
+- Messages have `is_read` tracking; fetching messages auto-marks them read; `PUT /listings/{id}/messages/read` endpoint available
 
 ### API Conventions
 - Multipart form-data for image uploads; JSON for everything else

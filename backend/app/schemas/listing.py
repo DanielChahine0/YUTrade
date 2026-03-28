@@ -102,7 +102,7 @@ class ListingUpdate(BaseModel):
     description: Optional[str] = Field(None, description="Updated item description", example="Minor cover wear, otherwise excellent")
     price: Optional[float] = Field(None, gt=0, description="New asking price in CAD dollars", example=20.00)
     category: Optional[str] = Field(None, description="Item category (Textbooks, Electronics, Furniture, Clothing, Other)", example="Electronics")
-    status: Optional[Literal["active", "sold", "removed"]] = Field(None, description="New status — use 'sold' when sold, 'removed' to take down", example="sold")
+    status: Optional[Literal["active", "pending", "sold", "removed"]] = Field(None, description="New status — use 'pending' for reserved, 'sold' when sold, 'removed' to take down", example="sold")
 
 
 class PaginatedListings(BaseModel):
