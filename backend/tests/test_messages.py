@@ -1,12 +1,21 @@
 # Assigned to: Raj (Rajendra Brahmbhatt)
 # Phase: 3 (B3.6)
+#
+# Comprehensive messaging tests covering:
+# - Send message (buyer to seller, seller reply, unauthorized, listing not found)
+# - Self-messaging prevention
+# - Message read tracking (default, auto-mark, explicit mark)
+# - Thread listing with unread counts
+# - Empty message content
+# - Multiple threads and isolation
+# - Get messages (authorized, unauthorized, non-participant)
 
 from app.models.listing import Listing
 from app.models.user import User
 
 
 def _create_listing(db_session, seller_id: int) -> Listing:
-    """Helper to insert a listing directly via ORM (listing router not yet implemented)."""
+    """Helper to insert a listing directly via ORM."""
     listing = Listing(
         seller_id=seller_id,
         title="Test Textbook",
@@ -23,6 +32,9 @@ def _create_listing(db_session, seller_id: int) -> Listing:
 def _get_user_id(db_session, email: str) -> int:
     """Look up a user's ID by email."""
     return db_session.query(User).filter(User.email == email).first().id
+
+
+# ── Send message tests ──────────────────────────────────────────────────
 
 
 def test_send_message_to_seller(client, db_session, auth_headers, second_auth_headers):
@@ -67,35 +79,6 @@ def test_seller_reply(client, db_session, auth_headers, second_auth_headers):
     assert data["receiver_id"] == buyer_id
 
 
-def test_get_messages(client, db_session, auth_headers, second_auth_headers):
-    """Participants can retrieve messages in chronological order."""
-    seller_id = _get_user_id(db_session, "testuser@my.yorku.ca")
-    listing = _create_listing(db_session, seller_id)
-
-    # Exchange messages
-    client.post(
-        f"/listings/{listing.id}/messages/",
-        json={"content": "First message"},
-        headers=second_auth_headers,
-    )
-    client.post(
-        f"/listings/{listing.id}/messages/",
-        json={"content": "Second message"},
-        headers=auth_headers,
-    )
-
-    # Buyer fetches messages
-    resp = client.get(
-        f"/listings/{listing.id}/messages/",
-        headers=second_auth_headers,
-    )
-    assert resp.status_code == 200
-    messages = resp.json()["messages"]
-    assert len(messages) == 2
-    assert messages[0]["content"] == "First message"
-    assert messages[1]["content"] == "Second message"
-
-
 def test_send_message_unauthorized(client, db_session, auth_headers):
     """Sending a message without auth returns 401."""
     seller_id = _get_user_id(db_session, "testuser@my.yorku.ca")
@@ -129,6 +112,107 @@ def test_cannot_message_self(client, db_session, auth_headers):
         headers=auth_headers,
     )
     assert resp.status_code == 400
+
+
+def test_send_empty_message(client, db_session, auth_headers, second_auth_headers):
+    """Sending an empty message content is rejected (min_length=1)."""
+    seller_id = _get_user_id(db_session, "testuser@my.yorku.ca")
+    listing = _create_listing(db_session, seller_id)
+
+    resp = client.post(
+        f"/listings/{listing.id}/messages/",
+        json={"content": ""},
+        headers=second_auth_headers,
+    )
+    assert resp.status_code == 422
+
+
+def test_send_message_missing_content(client, db_session, auth_headers, second_auth_headers):
+    """Sending message without content field returns 422."""
+    seller_id = _get_user_id(db_session, "testuser@my.yorku.ca")
+    listing = _create_listing(db_session, seller_id)
+
+    resp = client.post(
+        f"/listings/{listing.id}/messages/",
+        json={},
+        headers=second_auth_headers,
+    )
+    assert resp.status_code == 422
+
+
+def test_send_long_message(client, db_session, auth_headers, second_auth_headers):
+    """A long message content is accepted."""
+    seller_id = _get_user_id(db_session, "testuser@my.yorku.ca")
+    listing = _create_listing(db_session, seller_id)
+
+    long_content = "A" * 5000
+    resp = client.post(
+        f"/listings/{listing.id}/messages/",
+        json={"content": long_content},
+        headers=second_auth_headers,
+    )
+    assert resp.status_code == 201
+    assert resp.json()["content"] == long_content
+
+
+# ── Get messages tests ──────────────────────────────────────────────────
+
+
+def test_get_messages(client, db_session, auth_headers, second_auth_headers):
+    """Participants can retrieve messages in chronological order."""
+    seller_id = _get_user_id(db_session, "testuser@my.yorku.ca")
+    listing = _create_listing(db_session, seller_id)
+
+    client.post(
+        f"/listings/{listing.id}/messages/",
+        json={"content": "First message"},
+        headers=second_auth_headers,
+    )
+    client.post(
+        f"/listings/{listing.id}/messages/",
+        json={"content": "Second message"},
+        headers=auth_headers,
+    )
+
+    resp = client.get(
+        f"/listings/{listing.id}/messages/",
+        headers=second_auth_headers,
+    )
+    assert resp.status_code == 200
+    messages = resp.json()["messages"]
+    assert len(messages) == 2
+    assert messages[0]["content"] == "First message"
+    assert messages[1]["content"] == "Second message"
+
+
+def test_get_messages_unauthorized(client, db_session, auth_headers):
+    """Getting messages without auth returns 401."""
+    seller_id = _get_user_id(db_session, "testuser@my.yorku.ca")
+    listing = _create_listing(db_session, seller_id)
+
+    resp = client.get(f"/listings/{listing.id}/messages/")
+    assert resp.status_code == 401
+
+
+def test_get_messages_includes_sender_info(client, db_session, auth_headers, second_auth_headers):
+    """Messages include sender name and id."""
+    seller_id = _get_user_id(db_session, "testuser@my.yorku.ca")
+    listing = _create_listing(db_session, seller_id)
+
+    client.post(
+        f"/listings/{listing.id}/messages/",
+        json={"content": "Hello!"},
+        headers=second_auth_headers,
+    )
+
+    resp = client.get(f"/listings/{listing.id}/messages/", headers=auth_headers)
+    msg = resp.json()["messages"][0]
+    assert "sender" in msg
+    assert msg["sender"]["name"] == "Test User 2"
+    assert "id" in msg["sender"]
+
+
+# ── Read tracking tests ─────────────────────────────────────────────────
 
 
 def test_message_is_read_default_false(client, db_session, auth_headers, second_auth_headers):
@@ -219,3 +303,100 @@ def test_threads_include_unread_count(client, db_session, auth_headers, second_a
     threads = resp.json()["threads"]
     assert len(threads) == 1
     assert threads[0]["unread_count"] == 1
+
+
+def test_threads_unauthenticated(client):
+    """GET /messages/threads without auth returns 401."""
+    resp = client.get("/messages/threads")
+    assert resp.status_code == 401
+
+
+def test_threads_empty_for_new_user(client, auth_headers):
+    """A user with no messages has empty thread list."""
+    resp = client.get("/messages/threads", headers=auth_headers)
+    assert resp.status_code == 200
+    assert resp.json()["threads"] == []
+
+
+def test_threads_include_listing_info(client, db_session, auth_headers, second_auth_headers):
+    """Threads include listing title and other user info."""
+    seller_id = _get_user_id(db_session, "testuser@my.yorku.ca")
+    listing = _create_listing(db_session, seller_id)
+
+    client.post(
+        f"/listings/{listing.id}/messages/",
+        json={"content": "Interested!"},
+        headers=second_auth_headers,
+    )
+
+    resp = client.get("/messages/threads", headers=auth_headers)
+    thread = resp.json()["threads"][0]
+    assert "listing_id" in thread
+    assert "listing_title" in thread
+    assert "other_user_id" in thread
+    assert "last_message" in thread
+    assert "message_count" in thread
+
+
+def test_threads_show_latest_message(client, db_session, auth_headers, second_auth_headers):
+    """Thread last_message reflects the most recent message."""
+    seller_id = _get_user_id(db_session, "testuser@my.yorku.ca")
+    listing = _create_listing(db_session, seller_id)
+
+    client.post(
+        f"/listings/{listing.id}/messages/",
+        json={"content": "First msg"},
+        headers=second_auth_headers,
+    )
+    client.post(
+        f"/listings/{listing.id}/messages/",
+        json={"content": "Latest msg"},
+        headers=auth_headers,
+    )
+
+    resp = client.get("/messages/threads", headers=second_auth_headers)
+    thread = resp.json()["threads"][0]
+    assert thread["last_message"] == "Latest msg"
+    assert thread["message_count"] == 2
+
+
+# ── Multi-conversation tests ────────────────────────────────────────────
+
+
+def test_multiple_threads_on_different_listings(client, db_session, auth_headers, second_auth_headers):
+    """A user can have threads on multiple listings."""
+    seller_id = _get_user_id(db_session, "testuser@my.yorku.ca")
+    listing1 = _create_listing(db_session, seller_id)
+    listing2 = _create_listing(db_session, seller_id)
+
+    client.post(
+        f"/listings/{listing1.id}/messages/",
+        json={"content": "About listing 1"},
+        headers=second_auth_headers,
+    )
+    client.post(
+        f"/listings/{listing2.id}/messages/",
+        json={"content": "About listing 2"},
+        headers=second_auth_headers,
+    )
+
+    resp = client.get("/messages/threads", headers=auth_headers)
+    threads = resp.json()["threads"]
+    assert len(threads) == 2
+    listing_ids = {t["listing_id"] for t in threads}
+    assert listing1.id in listing_ids
+    assert listing2.id in listing_ids
+
+
+def test_message_response_has_timestamps(client, db_session, auth_headers, second_auth_headers):
+    """Messages include created_at timestamps."""
+    seller_id = _get_user_id(db_session, "testuser@my.yorku.ca")
+    listing = _create_listing(db_session, seller_id)
+
+    resp = client.post(
+        f"/listings/{listing.id}/messages/",
+        json={"content": "Timed message"},
+        headers=second_auth_headers,
+    )
+    assert resp.status_code == 201
+    assert "created_at" in resp.json()
