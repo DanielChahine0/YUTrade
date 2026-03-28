@@ -346,23 +346,37 @@ def test_forgot_password_missing_email(client):
 
 
 def test_multiple_reset_codes_only_latest_valid(client, db_session):
-    """Requesting multiple reset codes invalidates previous ones."""
+    """Requesting multiple reset codes deletes previous ones; only the latest works."""
     client.post("/auth/register", json={
         "email": "multicode@my.yorku.ca",
         "password": "securepass1",
         "name": "Multi Code",
     })
 
-    # Request two reset codes
+    # Request first code, capture it
     client.post("/auth/forgot-password", json={"email": "multicode@my.yorku.ca"})
-    client.post("/auth/forgot-password", json={"email": "multicode@my.yorku.ca"})
+    first_code = db_session.query(PasswordResetCode).order_by(
+        PasswordResetCode.id.desc()
+    ).first()
+    first_code_value = first_code.code
 
-    # Get the latest code
+    # Request second code (deletes the first)
+    client.post("/auth/forgot-password", json={"email": "multicode@my.yorku.ca"})
+    db_session.expire_all()
+
     latest = db_session.query(PasswordResetCode).order_by(
         PasswordResetCode.id.desc()
     ).first()
 
-    # Use latest code
+    # First code should no longer work
+    resp_old = client.post("/auth/reset-password", json={
+        "email": "multicode@my.yorku.ca",
+        "code": first_code_value,
+        "new_password": "should_fail1",
+    })
+    assert resp_old.status_code == 400
+
+    # Latest code works
     resp = client.post("/auth/reset-password", json={
         "email": "multicode@my.yorku.ca",
         "code": latest.code,
