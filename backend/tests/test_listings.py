@@ -288,6 +288,21 @@ def test_update_listing_not_owner(client, auth_headers, second_auth_headers):
     assert patch_resp.status_code == 403
 
 
+def test_update_listing_pending_status(client, auth_headers):
+    """Owner can set listing status to 'pending'."""
+    create_resp = _create_listing(client, auth_headers, title="Pending Test", price="15.00", category="Other")
+    assert create_resp.status_code == 201
+    listing_id = create_resp.json()["id"]
+
+    patch_resp = client.patch(
+        f"/listings/{listing_id}",
+        data={"status": "pending"},
+        headers=auth_headers,
+    )
+    assert patch_resp.status_code == 200
+    assert patch_resp.json()["status"] == "pending"
+
+
 def test_create_listing_with_images(client, auth_headers):
     """
     Tests: POST /listings/ with images attached

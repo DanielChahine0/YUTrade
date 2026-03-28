@@ -129,3 +129,93 @@ def test_cannot_message_self(client, db_session, auth_headers):
         headers=auth_headers,
     )
     assert resp.status_code == 400
+
+
+def test_message_is_read_default_false(client, db_session, auth_headers, second_auth_headers):
+    """New messages should have is_read=False by default."""
+    seller_id = _get_user_id(db_session, "testuser@my.yorku.ca")
+    listing = _create_listing(db_session, seller_id)
+
+    resp = client.post(
+        f"/listings/{listing.id}/messages/",
+        json={"content": "Is this available?"},
+        headers=second_auth_headers,
+    )
+    assert resp.status_code == 201
+    assert resp.json()["is_read"] is False
+
+
+def test_get_messages_marks_unread_as_read(client, db_session, auth_headers, second_auth_headers):
+    """Fetching messages marks unread messages addressed to the current user as read."""
+    seller_id = _get_user_id(db_session, "testuser@my.yorku.ca")
+    listing = _create_listing(db_session, seller_id)
+
+    # Buyer sends message to seller
+    client.post(
+        f"/listings/{listing.id}/messages/",
+        json={"content": "Hello!"},
+        headers=second_auth_headers,
+    )
+
+    # Seller fetches messages — should mark buyer's message as read
+    resp = client.get(
+        f"/listings/{listing.id}/messages/",
+        headers=auth_headers,
+    )
+    assert resp.status_code == 200
+    messages = resp.json()["messages"]
+    assert len(messages) == 1
+    assert messages[0]["is_read"] is True
+
+
+def test_mark_messages_read_endpoint(client, db_session, auth_headers, second_auth_headers):
+    """PUT /listings/{id}/messages/read marks unread messages as read."""
+    seller_id = _get_user_id(db_session, "testuser@my.yorku.ca")
+    listing = _create_listing(db_session, seller_id)
+
+    # Buyer sends two messages
+    client.post(
+        f"/listings/{listing.id}/messages/",
+        json={"content": "Message 1"},
+        headers=second_auth_headers,
+    )
+    client.post(
+        f"/listings/{listing.id}/messages/",
+        json={"content": "Message 2"},
+        headers=second_auth_headers,
+    )
+
+    # Seller marks all as read
+    resp = client.put(
+        f"/listings/{listing.id}/messages/read",
+        headers=auth_headers,
+    )
+    assert resp.status_code == 200
+    assert resp.json()["marked_read"] == 2
+
+    # Calling again should return 0
+    resp = client.put(
+        f"/listings/{listing.id}/messages/read",
+        headers=auth_headers,
+    )
+    assert resp.json()["marked_read"] == 0
+
+
+def test_threads_include_unread_count(client, db_session, auth_headers, second_auth_headers):
+    """GET /messages/threads should include unread_count per thread."""
+    seller_id = _get_user_id(db_session, "testuser@my.yorku.ca")
+    listing = _create_listing(db_session, seller_id)
+
+    # Buyer sends a message
+    client.post(
+        f"/listings/{listing.id}/messages/",
+        json={"content": "Hey!"},
+        headers=second_auth_headers,
+    )
+
+    # Seller checks threads — should see 1 unread
+    resp = client.get("/messages/threads", headers=auth_headers)
+    assert resp.status_code == 200
+    threads = resp.json()["threads"]
+    assert len(threads) == 1
+    assert threads[0]["unread_count"] == 1

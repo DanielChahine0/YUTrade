@@ -24,6 +24,7 @@ class MessageOut(BaseModel):
     receiver_id: int
     sender: SenderOut
     content: str
+    is_read: bool
     created_at: datetime
 
     class Config:

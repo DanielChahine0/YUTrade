@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.dependencies import get_db, get_current_user
 from app.models.user import User
 from app.schemas.message import MessageCreate, MessageOut
-from app.services.message_service import send_message, get_messages
+from app.services.message_service import send_message, get_messages, mark_messages_read
 
 router = APIRouter()
 
@@ -36,3 +36,14 @@ def list_messages(
     """Get all messages for a listing where current user is a participant."""
     messages = get_messages(db, listing_id, current_user.id)
     return {"messages": [MessageOut.model_validate(m) for m in messages]}
+
+
+@router.put("/read", status_code=status.HTTP_200_OK)
+def read_messages(
+    listing_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Mark all unread messages in this listing thread as read for the current user."""
+    count = mark_messages_read(db, listing_id, current_user.id)
+    return {"marked_read": count}
