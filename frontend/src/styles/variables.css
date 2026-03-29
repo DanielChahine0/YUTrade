@@ -1,120 +1,87 @@
-/* Assigned to: Harnaindeep Kaur */
-/* Phase: 1 (F1.9) */
+/* ═══════════════════════════════════════════════════════════
+   YUTrade Design System — Token Definitions
+   ═══════════════════════════════════════════════════════════ */
 
 :root {
-  /* York University Branding */
+  /* ─── Typography ─── */
+  --font-display: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* ─── York University Branding ─── */
   --yu-red: #E31837;
-  --yu-red-dark: #b0122a; /* For button hover states */
-  --yu-black: #000000;
+  --yu-red-dark: #C41230;
+  --yu-red-deeper: #9B0E22;
+  --yu-red-light: #FFF0F2;
+  --yu-red-glow: rgba(227, 24, 55, 0.15);
+  --yu-black: #0A0A0A;
   --yu-white: #ffffff;
 
-  /* Neutrals / Grays */
-  --gray-50: #f9fafb;
-  --gray-100: #f3f4f6;
-  --gray-200: #e5e7eb;
-  --gray-300: #d1d5db;
-  --gray-600: #4b5563;
-  --gray-800: #1f2937;
-  
-  /* Semantic Colors */
+  /* ─── Neutrals (warm-tinted) ─── */
+  --gray-25: #FDFCFB;
+  --gray-50: #FAF9F7;
+  --gray-100: #F3F2F0;
+  --gray-200: #E8E6E3;
+  --gray-300: #D4D1CD;
+  --gray-400: #A8A4A0;
+  --gray-500: #7A7672;
+  --gray-600: #545250;
+  --gray-700: #3D3B39;
+  --gray-800: #262524;
+  --gray-900: #171615;
+
+  /* ─── Semantic Colors ─── */
+  --text-primary: var(--gray-900);
+  --text-secondary: var(--gray-600);
+  --text-tertiary: var(--gray-400);
   --text-main: var(--gray-800);
-  --text-muted: var(--gray-600);
+  --text-muted: var(--gray-500);
   --border-color: var(--gray-200);
+  --border-light: var(--gray-100);
   --bg-app: var(--gray-50);
-  --error-red: #d32f2f;
-  --success-green: #2e7d32;
+  --bg-card: var(--yu-white);
+  --bg-elevated: var(--yu-white);
 
-  /* Layout & Spacing */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-pill: 9999px; /* Great for your category buttons! */
-  
-  /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+  --error-red: #DC2626;
+  --error-bg: #FEF2F2;
+  --error-border: #FECACA;
+  --success-green: #16A34A;
+  --success-bg: #F0FDF4;
+  --warning-amber: #D97706;
+  --warning-bg: #FFFBEB;
 
-  /* Animations */
-  --transition: all 0.2s ease-in-out;
-  
-  /* Container Width */
-  --container-width: 1200px;
+  /* ─── Layout & Spacing ─── */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+  --radius-pill: 9999px;
 
-  /* Add to your :root variables */
-:root {
-  /* ... existing vars ... */
-  --msg-bg-sent: #E31837;
+  --container-width: 1280px;
+  --navbar-height: 68px;
+
+  /* ─── Shadows ─── */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 24px 64px rgba(0, 0, 0, 0.12);
+  --shadow-card-hover: 0 20px 48px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.06);
+  --shadow-red: 0 4px 16px rgba(227, 24, 55, 0.25);
+  --shadow-red-lg: 0 8px 32px rgba(227, 24, 55, 0.3);
+
+  /* ─── Transitions ─── */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-fast: 150ms var(--ease-out);
+  --transition: 250ms var(--ease-out);
+  --transition-slow: 400ms var(--ease-out);
+
+  /* ─── Messages ─── */
+  --msg-bg-sent: var(--yu-red);
   --msg-text-sent: #ffffff;
-  --msg-bg-received: #f1f0f0;
-  --msg-text-received: #222222;
-}
-
-/* ============================================================
-   MESSAGES PAGE (F3.4)
-   ============================================================ */
-
-.messages-list-container {
-  background: var(--yu-white);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-  overflow: hidden;
-}
-
-.message-thread-row {
-  display: flex;
-  align-items: center;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--gray-100);
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.message-thread-row:hover {
-  background: var(--gray-50);
-}
-
-.message-thread-row.unread {
-  background: #fff8f8;
-  border-left: 4px solid var(--yu-red);
-}
-
-.thread-avatar {
-  width: 50px;
-  height: 50px;
-  border-radius: var(--radius-md);
-  object-fit: cover;
-  margin-right: 16px;
-  background: var(--gray-100);
-}
-
-.thread-info {
-  flex: 1;
-  min-width: 0; /* Enables text-overflow: ellipsis */
-}
-
-.thread-top-line {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 4px;
-}
-
-.thread-title {
-  font-weight: 700;
-  font-size: 15px;
-  color: var(--yu-black);
-}
-
-.thread-date {
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.thread-preview-text {
-  font-size: 13px;
-  color: var(--text-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+  --msg-bg-received: var(--gray-100);
+  --msg-text-received: var(--gray-800);
 }
