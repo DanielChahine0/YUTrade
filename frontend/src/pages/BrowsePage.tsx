@@ -7,11 +7,13 @@ import { getListings } from "../api/listings";
 import { Listing } from "../types";
 import ListingCard from "../components/ListingCard";
 import SearchBar from "../components/SearchBar";
+import { useAuth } from "../hooks/useAuth";
 
 const CATEGORIES = ["All", "Textbooks", "Electronics", "Furniture", "Clothing", "Other"];
 
 export default function BrowsePage() {
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
 
   const [listings, setListings] = useState<Listing[]>([]);
   const [total, setTotal] = useState(0);
@@ -83,37 +85,31 @@ export default function BrowsePage() {
 
   return (
     <div className="app-content">
-      
+
+      {/* Hero Section */}
+      <div className="browse-hero">
+        <h1 className="browse-hero-title">
+          {isAuthenticated ? `Welcome back, ${user?.name}` : "York's Campus Marketplace"}
+        </h1>
+        <p className="browse-hero-subtitle">
+          {isAuthenticated
+            ? "Find great deals from fellow York students or list something to sell."
+            : "Buy and sell textbooks, electronics, and more with fellow York University students."}
+        </p>
+      </div>
+
       {/* Search Bar */}
       <SearchBar onSearch={handleSearch} />
 
       {/* Category Pills */}
-      <div
-        style={{
-          display: "flex",
-          gap: 8,
-          flexWrap: "wrap",
-          marginBottom: 20,
-        }}
-      >
+      <div className="category-pills">
         {CATEGORIES.map((cat) => {
           const active = (cat === "All" && !category) || cat === category;
-
           return (
             <button
               key={cat}
               onClick={() => handleCategoryChange(cat)}
-              style={{
-                padding: "8px 16px",
-                borderRadius: "20px",
-                border: "1.5px solid",
-                borderColor: active ? "#E31837" : "#ddd",
-                background: active ? "#E31837" : "#fff",
-                color: active ? "#fff" : "#555",
-                cursor: "pointer",
-                fontSize: 14,
-                fontWeight: active ? 600 : 400,
-              }}
+              className={`category-pill${active ? " active" : ""}`}
             >
               {cat}
             </button>
@@ -123,17 +119,21 @@ export default function BrowsePage() {
 
       {/* Results */}
       {loading ? (
-        <p style={{ textAlign: "center", padding: "48px 0" }}>
+        <div className="loading-state">
           Loading listings...
-        </p>
+        </div>
       ) : error ? (
-        <p style={{ textAlign: "center", padding: "48px 0", color: "red" }}>
+        <div className="loading-state" style={{ color: "var(--error-red)" }}>
           {error}
-        </p>
+        </div>
       ) : listings.length === 0 ? (
-        <p style={{ textAlign: "center", padding: "48px 0" }}>
-          No listings found.
-        </p>
+        <div className="empty-state">
+          <div className="empty-state-icon">🔍</div>
+          <div className="empty-state-title">No listings found</div>
+          <p className="empty-state-text">
+            Try adjusting your search or filters to find what you're looking for.
+          </p>
+        </div>
       ) : (
         <div className="listings-grid">
           {listings.map((listing) => (
@@ -148,29 +148,23 @@ export default function BrowsePage() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: 16,
-            marginTop: 40,
-          }}
-        >
+        <div className="pagination">
           <button
             className="btn-outline"
+            style={{ width: "auto", padding: "10px 20px" }}
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
           >
             Previous
           </button>
 
-          <span style={{ fontSize: 14 }}>
+          <span className="pagination-info">
             Page {page} of {totalPages}
           </span>
 
           <button
             className="btn-outline"
+            style={{ width: "auto", padding: "10px 20px" }}
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
           >

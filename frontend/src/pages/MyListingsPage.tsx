@@ -1,9 +1,6 @@
 // Assigned to: Harnaindeep Kaur
 // Phase: 2 (F2.6)
 
-/* Assigned to: Harnaindeep Kaur */
-/* Phase: 2 (F2.6) */
-
 import React, { useState, useEffect, useContext } from "react"
 import { useNavigate } from "react-router-dom"
 import { getListings, deleteListing } from "../api/listings"
@@ -60,19 +57,16 @@ export default function MyListingsPage() {
     <div className="app-content">
 
       {/* Header */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 24
-        }}
-      >
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 28
+      }}>
         <h1 className="auth-title" style={{ margin: 0, textAlign: "left" }}>
           My Listings
         </h1>
 
-        {/* ONLY show this button if not loading AND they already have listings */}
         {!loading && listings.length > 0 && (
           <button
             className="btn-red"
@@ -85,29 +79,23 @@ export default function MyListingsPage() {
       </div>
 
       {loading ? (
-        <p style={{ textAlign: "center", paddingTop: 48, color: "#aaa" }}>
-          Loading...
-        </p>
+        <div className="loading-state">Loading...</div>
       ) : listings.length === 0 ? (
-
-        /* EMPTY STATE - Shown only if listings.length is 0 */
-        <div style={{ textAlign: "center", paddingTop: 48 }}>
-          <p style={{ color: "#888", marginBottom: 16 }}>
-            You haven't created any listings yet.
+        <div className="empty-state">
+          <div className="empty-state-icon">📦</div>
+          <div className="empty-state-title">No listings yet</div>
+          <p className="empty-state-text">
+            You haven't created any listings yet. Start selling to fellow York students!
           </p>
-
           <button
             className="btn-red"
-            style={{ width: "auto", padding: "8px 20px" }}
+            style={{ width: "auto", padding: "12px 28px", marginTop: 20 }}
             onClick={() => navigate("/create")}
           >
             Post Your First Item
           </button>
         </div>
-
       ) : (
-
-        /* LISTINGS TABLE - Shown only if they have postings */
         <div className="listings-table-wrap">
           <table className="listings-table">
             <thead>
@@ -137,7 +125,7 @@ export default function MyListingsPage() {
                             alt={listing.title}
                           />
                         ) : (
-                          <span style={{ color: "#ccc", fontSize: 12 }}>
+                          <span style={{ color: "var(--gray-300)", fontSize: 12 }}>
                             No Image
                           </span>
                         )}
@@ -148,7 +136,7 @@ export default function MyListingsPage() {
                       style={{
                         fontWeight: 600,
                         cursor: "pointer",
-                        color: "#E31837"
+                        color: "var(--yu-red)"
                       }}
                       onClick={() => navigate(`/listings/${listing.id}`)}
                     >
@@ -170,7 +158,7 @@ export default function MyListingsPage() {
                     <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
                       <button
                         className="btn-table-action"
-                        style={{ background: "#444", marginRight: 6 }}
+                        style={{ background: "var(--gray-700)", marginRight: 6 }}
                         onClick={() => navigate(`/listings/${listing.id}/edit`)}
                       >
                         Edit
@@ -189,7 +177,6 @@ export default function MyListingsPage() {
             </tbody>
           </table>
         </div>
-
       )}
     </div>
   )

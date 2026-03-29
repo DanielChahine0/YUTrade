@@ -32,7 +32,6 @@ export default function AccountPage() {
 
     try {
       const updatedUser = await updateProfile({ name: name.trim() })
-      // Update AuthContext so the navbar reflects the new name
       if (token) {
         login(token, updatedUser)
       }
@@ -95,114 +94,113 @@ export default function AccountPage() {
 
   return (
     <div className="app-content">
-      <h1 className="auth-title" style={{ textAlign: "left" }}>Account Settings</h1>
+      <h1 className="auth-title" style={{ textAlign: "left", marginBottom: 32 }}>Account Settings</h1>
 
       {/* Profile Section */}
-      <div className="auth-card" style={{ maxWidth: 500, marginBottom: 32 }}>
-        <h2 style={{ fontSize: 18, marginBottom: 16 }}>Profile</h2>
+      <div className="account-section">
+        <h2 className="account-section-title">Profile</h2>
 
-        <form onSubmit={handleNameUpdate}>
-          <label className="auth-label">Email</label>
-          <input
-            className="auth-input"
-            type="text"
-            value={user?.email || ""}
-            disabled
-            style={{ backgroundColor: "#f5f5f5", color: "#888" }}
-          />
+        <form className="auth-form" onSubmit={handleNameUpdate}>
+          <div className="auth-field">
+            <label className="auth-label">Email</label>
+            <input
+              className="auth-input"
+              type="text"
+              value={user?.email || ""}
+              disabled
+              style={{ opacity: 0.6 }}
+            />
+          </div>
 
-          <label className="auth-label">Name</label>
-          <input
-            className="auth-input"
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Your display name"
-          />
+          <div className="auth-field">
+            <label className="auth-label">Name</label>
+            <input
+              className="auth-input"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Your display name"
+            />
+          </div>
 
-          {nameMsg && <p style={{ color: "green", fontSize: 14 }}>{nameMsg}</p>}
-          {nameError && <p style={{ color: "red", fontSize: 14 }}>{nameError}</p>}
+          {nameMsg && <p style={{ color: "var(--success-green)", fontSize: 14, fontWeight: 500 }}>{nameMsg}</p>}
+          {nameError && <p className="auth-error">{nameError}</p>}
 
-          <button className="btn-red" type="submit" style={{ marginTop: 8 }}>
+          <button className="btn-red" type="submit">
             Update Name
           </button>
         </form>
       </div>
 
       {/* Password Section */}
-      <div className="auth-card" style={{ maxWidth: 500, marginBottom: 32 }}>
-        <h2 style={{ fontSize: 18, marginBottom: 16 }}>Change Password</h2>
+      <div className="account-section">
+        <h2 className="account-section-title">Change Password</h2>
 
-        <form onSubmit={handlePasswordChange}>
-          <label className="auth-label">Current Password</label>
-          <input
-            className="auth-input"
-            type="password"
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            placeholder="Enter current password"
-          />
+        <form className="auth-form" onSubmit={handlePasswordChange}>
+          <div className="auth-field">
+            <label className="auth-label">Current Password</label>
+            <input
+              className="auth-input"
+              type="password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              placeholder="Enter current password"
+            />
+          </div>
 
-          <label className="auth-label">New Password</label>
-          <input
-            className="auth-input"
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            placeholder="Enter new password"
-          />
+          <div className="auth-field">
+            <label className="auth-label">New Password</label>
+            <input
+              className="auth-input"
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="Enter new password"
+            />
+          </div>
 
-          <label className="auth-label">Confirm New Password</label>
-          <input
-            className="auth-input"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Confirm new password"
-          />
+          <div className="auth-field">
+            <label className="auth-label">Confirm New Password</label>
+            <input
+              className="auth-input"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Confirm new password"
+            />
+          </div>
 
-          {pwMsg && <p style={{ color: "green", fontSize: 14 }}>{pwMsg}</p>}
-          {pwError && <p style={{ color: "red", fontSize: 14 }}>{pwError}</p>}
+          {pwMsg && <p style={{ color: "var(--success-green)", fontSize: 14, fontWeight: 500 }}>{pwMsg}</p>}
+          {pwError && <p className="auth-error">{pwError}</p>}
 
-          <button className="btn-red" type="submit" style={{ marginTop: 8 }}>
+          <button className="btn-red" type="submit">
             Change Password
           </button>
         </form>
       </div>
 
       {/* Delete Account Section */}
-      <div className="auth-card" style={{ maxWidth: 500, border: "1px solid #E31837" }}>
-        <h2 style={{ fontSize: 18, marginBottom: 8, color: "#E31837" }}>Delete Account</h2>
-        <p style={{ fontSize: 14, color: "#666", marginBottom: 16 }}>
+      <div className="account-section account-danger">
+        <h2 className="account-section-title">Delete Account</h2>
+        <p style={{ fontSize: 14, color: "var(--text-secondary)", marginBottom: 20, lineHeight: 1.6 }}>
           This will permanently delete your account, all your listings, messages, and ratings. This action cannot be undone.
         </p>
 
-        <form onSubmit={handleDeleteAccount}>
-          <label className="auth-label">Confirm Password</label>
-          <input
-            className="auth-input"
-            type="password"
-            value={deletePassword}
-            onChange={(e) => setDeletePassword(e.target.value)}
-            placeholder="Enter your password to confirm"
-          />
+        <form className="auth-form" onSubmit={handleDeleteAccount}>
+          <div className="auth-field">
+            <label className="auth-label">Confirm Password</label>
+            <input
+              className="auth-input"
+              type="password"
+              value={deletePassword}
+              onChange={(e) => setDeletePassword(e.target.value)}
+              placeholder="Enter your password to confirm"
+            />
+          </div>
 
-          {deleteError && <p style={{ color: "red", fontSize: 14 }}>{deleteError}</p>}
+          {deleteError && <p className="auth-error">{deleteError}</p>}
 
-          <button
-            type="submit"
-            style={{
-              marginTop: 8,
-              width: "100%",
-              padding: "10px",
-              backgroundColor: "#E31837",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              fontWeight: "bold",
-              cursor: "pointer",
-            }}
-          >
+          <button className="btn-red" type="submit">
             Delete My Account
           </button>
         </form>

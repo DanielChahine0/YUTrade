@@ -1,31 +1,5 @@
 // Assigned to: Harnaindeep Kaur
 // Phase: 3 (F3.4)
-//
-// TODO: Page showing all message conversations (protected).
-//
-// Layout:
-//   - Page title: "Messages"
-//   - List of conversation threads, grouped by listing
-//   - Each thread shows:
-//       - Listing title and thumbnail
-//       - Other person's name
-//       - Last message preview (truncated)
-//       - Timestamp of last message
-//   - Clicking a thread navigates to /listings/{id} (with message section visible)
-//   - Empty state: "No messages yet"
-//
-// Behavior:
-//   1. On mount, fetch all listings where the user has sent or received messages
-//      (This may require a dedicated endpoint or fetching from multiple listing threads)
-//   2. Display threads sorted by most recent message first
-//   3. Show loading spinner while fetching
-//   4. Handle errors gracefully
-//
-// Note: The exact API approach for getting "all threads" may need coordination
-// with Raj's backend implementation. Options:
-//   a) A new GET /messages endpoint that returns all threads for the current user
-//   b) Client-side aggregation from multiple listing message endpoints
-//   Discuss with Raj to decide the best approach.
 // Edited by : Mai Komar
 
 import React, { useState, useEffect } from "react"
@@ -61,31 +35,31 @@ const MessagesPage: React.FC = () => {
       .finally(() => setLoadingActive(false))
   }, [listingId])
 
-useEffect(() => {
-  if (!user) {
-    setLoadingThreads(false)
-    return
-  }
-  getAllThreads()
-    .then(async (data) => {
-      const threads = data.threads || []
-      const threadsWithNames = await Promise.all(
-        threads.map(async (thread: any) => {
-          const listing = await getListing(thread.listing_id)
-          return {
-            ...thread,
-            other_user_name: listing.seller.name,
-            listing_image: listing.images?.[0]?.file_path 
-              ? `${API_URL}/${listing.images[0].file_path}` 
-              : null,
-          }
-        })
-      )
-      setThreads(threadsWithNames)
-    })
-    .catch((err) => console.error("Failed to load inbox", err))
-    .finally(() => setLoadingThreads(false))
-}, [user])
+  useEffect(() => {
+    if (!user) {
+      setLoadingThreads(false)
+      return
+    }
+    getAllThreads()
+      .then(async (data) => {
+        const threads = data.threads || []
+        const threadsWithNames = await Promise.all(
+          threads.map(async (thread: any) => {
+            const listing = await getListing(thread.listing_id)
+            return {
+              ...thread,
+              other_user_name: listing.seller.name,
+              listing_image: listing.images?.[0]?.file_path
+                ? `${API_URL}/${listing.images[0].file_path}`
+                : null,
+            }
+          })
+        )
+        setThreads(threadsWithNames)
+      })
+      .catch((err) => console.error("Failed to load inbox", err))
+      .finally(() => setLoadingThreads(false))
+  }, [user])
 
   const handleBack = () => {
     navigate("/messages")
@@ -95,7 +69,7 @@ useEffect(() => {
     navigate(`/messages?listingId=${threadListingId}`)
   }
 
-  // — Active conversation view —
+  // Active conversation view
   if (listingId) {
     return (
       <div className="app-content">
@@ -104,14 +78,14 @@ useEffect(() => {
         </button>
 
         {loadingActive ? (
-          <p style={{ color: "#aaa", textAlign: "center", paddingTop: 48 }}>Loading...</p>
+          <div className="loading-state">Loading...</div>
         ) : activeListing && user ? (
           <>
-            <div style={{ marginBottom: 16 }}>
-              <h1 className="all-listings-title" style={{ margin: 0 }}>
+            <div style={{ marginBottom: 20 }}>
+              <h1 className="all-listings-title" style={{ margin: 0, borderBottom: "none", paddingBottom: 0 }}>
                 {activeListing.title}
               </h1>
-              <p style={{ fontSize: 13, color: "#888", marginTop: 4 }}>
+              <p style={{ fontSize: 14, color: "var(--text-secondary)", marginTop: 4 }}>
                 Seller: {activeListing.seller?.name}
               </p>
             </div>
@@ -122,127 +96,85 @@ useEffect(() => {
             />
           </>
         ) : (
-          <p style={{ color: "#888", textAlign: "center", paddingTop: 48 }}>
-            Listing not found.
-          </p>
+          <div className="loading-state">Listing not found.</div>
         )}
       </div>
     )
   }
 
-  // — Thread list view —
+  // Thread list view
   return (
     <div className="app-content">
-      <div style={{
-        marginBottom: 32,
-        paddingBottom: 16,
-        borderBottom: "1px solid #eee",
-      }}>
-        <h1 className="all-listings-title" style={{ margin: 0 }}>Your Messages</h1>
-        <p style={{ color: "#666", fontSize: 14, marginTop: 4 }}>
+      <div style={{ marginBottom: 32 }}>
+        <h1 className="all-listings-title" style={{ margin: 0, borderBottom: "none", paddingBottom: 0 }}>
+          Your Messages
+        </h1>
+        <p style={{ color: "var(--text-secondary)", fontSize: 15, marginTop: 6 }}>
           Manage your conversations with buyers and sellers here.
         </p>
       </div>
 
       {loadingThreads ? (
-        <p style={{ textAlign: "center", color: "#aaa", paddingTop: 48 }}>
-          Loading your messages...
-        </p>
+        <div className="loading-state">Loading your messages...</div>
       ) : threads.length === 0 ? (
-        <div className="listings-table-wrap" style={{
-          padding: "80px 20px",
-          textAlign: "center",
-          background: "var(--yu-white)",
-          border: "1px solid var(--border-color)",
-          borderRadius: "var(--radius-lg)",
-        }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>💬</div>
-          <h3 style={{ marginBottom: 8 }}>No messages yet</h3>
-          <p style={{ color: "#888", maxWidth: 450, margin: "0 auto" }}>
+        <div className="empty-state">
+          <div className="empty-state-icon">💬</div>
+          <div className="empty-state-title">No messages yet</div>
+          <p className="empty-state-text">
             When you contact a seller or someone messages about your listing,
             the conversation will appear here.
           </p>
         </div>
       ) : (
-        <div style={{
-          background: "#fff",
-          borderRadius: 16,
-          boxShadow: "0 2px 16px rgba(0,0,0,0.08)",
-          overflow: "hidden",
-        }}>
+        <div className="messages-list-container">
           {threads.map((thread, i) => (
             <div
               key={thread.listing_id}
+              className={`message-thread-row${thread.unread_count > 0 ? " unread" : ""}`}
               onClick={() => handleThreadClick(thread.listing_id)}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: "16px 20px",
-                borderBottom: i < threads.length - 1 ? "1px solid #f0f0f0" : "none",
-                cursor: "pointer",
-                transition: "background 0.15s",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "#fafafa")}
-              onMouseLeave={(e) => (e.currentTarget.style.background = "#fff")}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                {/* Avatar */}
-               <div className="detail-seller-avatar">
-                  {thread.listing_image ? (
-                    <img 
-                      src={thread.listing_image}  
-                      alt={thread.listing_title}
-                      style={{ width: 48, height: 48, borderRadius: 8, objectFit: "cover" }}
-                    />
-                  ) : (
-                    <div style={{
-                      width: 48,
-                      height: 48,
-                      borderRadius: 8,
-                      background: "#eee",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: "#ccc",
-                      fontSize: 18,
-                    }}>
-                      🖼️
-                    </div>
-                  )}
-                
-              </div>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: 14, color: "#1a1a1a" }}>
-                    {thread.other_user_name}
+              <div style={{ display: "flex", alignItems: "center", gap: 14, flex: 1, minWidth: 0 }}>
+                {thread.listing_image ? (
+                  <img
+                    src={thread.listing_image}
+                    alt={thread.listing_title}
+                    className="thread-avatar"
+                  />
+                ) : (
+                  <div className="thread-avatar" style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "var(--gray-300)",
+                    fontSize: 20,
+                  }}>
+                    🖼️
                   </div>
-                  <div style={{ fontSize: 13, color: "#888", marginTop: 1 }}>
+                )}
+                <div className="thread-info">
+                  <div className="thread-top-line">
+                    <span className="thread-title">{thread.other_user_name}</span>
+                  </div>
+                  <div style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 2 }}>
                     {thread.listing_title}
                   </div>
-                  <div style={{
-                    fontSize: 13,
-                    color: "#aaa",
-                    marginTop: 2,
-                    maxWidth: 340,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}>
+                  <div className="thread-preview-text">
                     {thread.last_message}
                   </div>
                 </div>
               </div>
               <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", flexShrink: 0, marginLeft: 16, gap: 6 }}>
-                <span style={{ fontSize: 12, color: "#bbb" }}>
+                <span className="thread-date">
                   {formatDate(thread.last_message_at)}
                 </span>
                 {thread.unread_count > 0 && (
                   <span style={{
-                    background: "#E31837",
+                    background: "var(--yu-red)",
                     color: "#fff",
-                    borderRadius: 10,
-                    padding: "1px 8px",
+                    borderRadius: "var(--radius-pill)",
+                    padding: "2px 8px",
                     fontSize: 11,
+                    fontFamily: "var(--font-display)",
                     fontWeight: 700,
                     minWidth: 20,
                     textAlign: "center",

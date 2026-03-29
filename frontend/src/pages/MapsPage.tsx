@@ -29,101 +29,39 @@ const MapsPage: React.FC = () => {
   ];
 
   return (
-    <div style={{ 
-      maxWidth: '1200px', 
-      margin: '0 auto', 
-      padding: '40px 20px',
-      fontFamily: '"Segoe UI", Roboto, Helvetica, Arial, sans-serif'
-    }}>
-      <div style={{ marginBottom: '20px', borderBottom: '2px solid #eee', paddingBottom: '20px' }}>
-        <h1 style={{ fontSize: '2.5rem', color: '#333', marginBottom: '10px' }}>Safe Meetup Locations</h1>
-        <p style={{ fontSize: '1.1rem', color: '#666', lineHeight: '1.6' }}>
-          We recommend meeting at these verified campus locations for all item exchanges. These spots are well-lit and typically have high foot traffic.
+    <div className="maps-page">
+      <div className="maps-header">
+        <h1 className="maps-title">Safe Meetup Locations</h1>
+        <p className="maps-subtitle">
+          We recommend meeting at these verified campus locations for all item exchanges.
+          These spots are well-lit and typically have high foot traffic.
         </p>
       </div>
 
-      <div style={{ 
-        marginBottom: '20px', 
-        padding: '30px', 
-        backgroundColor: '#f8f9fa', 
-        borderRadius: '12px',
-        textAlign: 'center'
-      }}>
-        <h4 style={{ marginBottom: '10px' }}>Safety Tips</h4>
-        <ul style={{ 
-          listStyle: 'none', 
-          padding: 0, 
-          color: '#666', 
-          display: 'flex', 
-          flexDirection: 'column', 
-          gap: '8px' 
-        }}>
-          <li>• Always meet during daylight hours if possible.</li>
-          <li>• Bring a friend along for the exchange.</li>
-          <li>• Tell someone where you are going and when you expect to be back.</li>
-          <li>• Trust your instincts—if a situation feels wrong, leave immediately.</li>
+      <div className="safety-tips">
+        <h4>Safety Tips</h4>
+        <ul className="safety-tips-list">
+          <li>Always meet during daylight hours if possible.</li>
+          <li>Bring a friend along for the exchange.</li>
+          <li>Tell someone where you are going and when you expect to be back.</li>
+          <li>Trust your instincts — if a situation feels wrong, leave immediately.</li>
         </ul>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
+      <div className="maps-grid">
         {maps.map((map, index) => (
-          <div 
-            key={index} 
-            style={{ 
-              backgroundColor: '#fff',
-              borderRadius: '16px',
-              overflow: 'hidden',
-              boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
-              border: '1px solid #f0f0f0'
-            }}
-          >
-            <div style={{ padding: '24px' }}>
-              <h3 style={{ fontSize: '1.5rem', color: '#222', marginBottom: '8px' }}>{map.name}</h3>
-              <p style={{ color: '#555', marginBottom: '24px', lineHeight: '1.5' }}>{map.description}</p>
-              
-              <div style={{ 
-                display: 'flex', 
-                gap: '20px', 
-                width: '100%',
-                flexWrap: 'wrap',
-                alignItems: 'stretch' 
-              }}>
-                <div style={{ 
-                  flex: '7 1 500px',
-                  minWidth: '300px',
-                  borderRadius: '12px',
-                  overflow: 'hidden',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-                  backgroundColor: '#f8f9fa' 
-                }}>
-                  <img 
-                    src={map.image} 
-                    alt={map.name}
-                    style={{ 
-                      width: '100%',
-                      height: '500px', 
-                      objectFit: 'contain', 
-                      display: 'block'
-                    }} 
-                  />
+          <div key={index} className="map-card">
+            <div className="map-card-content">
+              <h3 className="map-card-name">{map.name}</h3>
+              <p className="map-card-desc">{map.description}</p>
+              <div className="map-card-media">
+                <div className="map-card-image">
+                  <img src={map.image} alt={map.name} />
                 </div>
-                <div style={{ 
-                  flex: '3 1 350px',
-                  minWidth: '300px',
-                  borderRadius: '12px',
-                  overflow: 'hidden',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
-                }}>
+                <div className="map-card-embed">
                   <iframe
                     src={map.src}
                     title={map.name}
-                    style={{
-                      width: '100%',
-                      height: '100%', 
-                      minHeight: '400px',
-                      border: 0,
-                      display: 'block'
-                    }}
                     allowFullScreen
                     loading="lazy"
                   />
@@ -133,7 +71,6 @@ const MapsPage: React.FC = () => {
           </div>
         ))}
       </div>
-
     </div>
   );
 };
